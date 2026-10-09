@@ -45,15 +45,15 @@ PlasmaExtras.Menu {
     // Menu rows are compiled once instead of being built from QML strings at
     // runtime. The submenus below are populated from models, so they still
     // create their items on demand.
-    Component {
-        id: menuItemComponent
-
+    //
+    // These are declared as properties rather than plain children: a Menu's
+    // default property is its list of QMenuItem, so a bare `Component { }`
+    // child is a type error that makes the whole menu fail to load.
+    property Component menuItemComponent: Component {
         PlasmaExtras.MenuItem {}
     }
 
-    Component {
-        id: separatorComponent
-
+    property Component separatorComponent: Component {
         PlasmaExtras.MenuItem {
             separator: true
         }
