@@ -127,15 +127,20 @@ PlasmaExtras.Menu {
         });
     }
 
+    // The task's AppId is the .desktop menu id (e.g. "org.kde.dolphin.desktop"),
+    // so match against the .desktop form by default for any app id.
+    function appIdMatches(desktopId) {
+        const appId = String(menu.get(menu.atm.AppId) ?? "");
+        return appId === desktopId
+            || appId === desktopId + ".desktop"
+            || (appId.endsWith(".desktop") && appId.slice(0, appId.length - 8) === desktopId);
+    }
+
     // The stock task manager adds the user's Places for file managers (its
     // C++ backend checks the .desktop "FileManager" category). QML cannot
     // read an app's categories, so this is limited to Dolphin.
     function isDolphin() {
-        let appId = String(menu.get(menu.atm.AppId) ?? "");
-        if (appId.endsWith(".desktop")) {
-            appId = appId.slice(0, appId.length - 8);
-        }
-        return appId === "org.kde.dolphin" || appId === "dolphin";
+        return appIdMatches("org.kde.dolphin") || appIdMatches("dolphin");
     }
 
     function placeIcon(url) {
