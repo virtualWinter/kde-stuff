@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kcfg xmlns="http://www.kde.org/standards/kcfg/1.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0 http://www.kde.org/standards/kcfg/1.0/kcfg.xsd">
+  <kcfgfile name=""/>
+  <group name="General">
+    <entry name="iconName" type="String">
+      <label>Panel button icon name override</label>
+      <default></default>
+    </entry>
+    <entry name="columns" type="Int">
+      <label>Icons per row</label>
+      <default>7</default>
+      <min>3</min>
+      <max>12</max>
+    </entry>
+    <entry name="rows" type="Int">
+      <label>Rows per page</label>
+      <default>5</default>
+      <min>3</min>
+      <max>8</max>
+    </entry>
+    <entry name="cellSize" type="Int">
+      <label>Application cell size in pixels</label>
+      <default>112</default>
+      <min>48</min>
+      <max>200</max>
+    </entry>
+    <entry name="contentPadding" type="Int">
+      <label>Content padding in pixels</label>
+      <default>8</default>
+      <min>0</min>
+      <max>48</max>
+    </entry>
+    <entry name="applicationIconScale" type="Int">
+      <label>Application icon size as a percentage of its cell</label>
+      <default>42</default>
+      <min>20</min>
+      <max>80</max>
+    </entry>
+    <entry name="panelIconScale" type="Int">
+      <label>Panel button icon size as a percentage of the button</label>
+      <default>100</default>
+      <min>50</min>
+      <max>100</max>
+    </entry>
+    <entry name="pageTransitionDuration" type="Int">
+      <label>Page transition duration in milliseconds</label>
+      <default>250</default>
+      <min>0</min>
+      <max>1000</max>
+    </entry>
+    <entry name="touchpadSwipeThreshold" type="Int">
+      <label>Touchpad swipe distance needed to change page</label>
+      <default>8</default>
+      <min>1</min>
+      <max>120</max>
+    </entry>
+    <entry name="hiddenApplications" type="StringList">
+      <label>Application IDs hidden from Launchpad</label>
+      <default></default>
+    </entry>
+    <entry name="showLabels" type="Bool">
+      <label>Show application names</label>
+      <default>true</default>
+    </entry>
+    <entry name="showSearch" type="Bool">
+      <label>Show the search field</label>
+      <default>true</default>
+    </entry>
+    <entry name="showPageIndicators" type="Bool">
+      <label>Show page indicators</label>
+      <default>true</default>
+    </entry>
+    <entry name="closeOnBackgroundClick" type="Bool">
+      <label>Close when an empty area is clicked</label>
+      <default>true</default>
+    </entry>
+    <entry name="closeOnLaunch" type="Bool">
+      <label>Close after launching an application</label>
+      <default>true</default>
+    </entry>
+  </group>
+</kcfg>

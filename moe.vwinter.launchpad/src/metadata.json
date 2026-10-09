@@ -1,0 +1,17 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "vwinter"
+            }
+        ],
+        "Category": "Application Launchers",
+        "Description": "A macOS Launchpad-style fullscreen application grid with paging and search.",
+        "Icon": "applications-other",
+        "Name": "v-launchpad",
+        "Version": "0.1.0",
+        "X-Plasma-MainScript": "ui/main.qml"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0"
+}

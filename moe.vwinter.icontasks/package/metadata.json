@@ -1,0 +1,20 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "vwinter"
+            }
+        ],
+        "Category": "Windows and Tasks",
+        "Description": "Lightweight icons-only task manager: a dot under every running app and a short line under the focused one.",
+        "Icon": "preferences-system-windows",
+        "Id": "moe.vwinter.icontasks",
+        "Name": "v-taskmanager",
+        "Version": "0.1.0"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0",
+    "X-Plasma-Provides": [
+        "org.kde.plasma.multitasking"
+    ]
+}

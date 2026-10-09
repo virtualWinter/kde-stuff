@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kcfg xmlns="http://www.kde.org/standards/kcfg/1.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0 http://www.kde.org/standards/kcfg/1.0/kcfg.xsd">
+  <kcfgfile name=""/>
+  <group name="General">
+    <entry name="iconName" type="String">
+      <label>Menu button icon name override</label>
+      <default></default>
+    </entry>
+    <entry name="menuBackgroundColor" type="String">
+      <label>Menu background color</label>
+      <default></default>
+    </entry>
+    <entry name="menuWidth" type="Int">
+      <label>Menu width in grid units</label>
+      <default>12</default>
+      <min>8</min>
+      <max>24</max>
+    </entry>
+    <entry name="showAbout" type="Bool">
+      <label>Show "About This System"</label>
+      <default>true</default>
+    </entry>
+    <entry name="showSystemSettings" type="Bool">
+      <label>Show "System Settings"</label>
+      <default>true</default>
+    </entry>
+    <entry name="showSoftwareCenter" type="Bool">
+      <label>Show "Software Center"</label>
+      <default>true</default>
+    </entry>
+    <entry name="showForceQuit" type="Bool">
+      <label>Show "Force Quit"</label>
+      <default>true</default>
+    </entry>
+    <entry name="showScreenshot" type="Bool">
+      <label>Show "Take a Screenshot"</label>
+      <default>true</default>
+    </entry>
+    <entry name="showSleep" type="Bool">
+      <label>Show "Sleep"</label>
+      <default>true</default>
+    </entry>
+    <entry name="showRestart" type="Bool">
+      <label>Show "Restart"</label>
+      <default>true</default>
+    </entry>
+    <entry name="showShutdown" type="Bool">
+      <label>Show "Shut Down"</label>
+      <default>true</default>
+    </entry>
+    <entry name="showLock" type="Bool">
+      <label>Show "Lock Screen"</label>
+      <default>true</default>
+    </entry>
+    <entry name="showLogout" type="Bool">
+      <label>Show "Log Out"</label>
+      <default>true</default>
+    </entry>
+    <entry name="keepGlobalMenu" type="Bool">
+      <label>Keep the global menu visible while this menu is open</label>
+      <default>true</default>
+    </entry>
+  </group>
+</kcfg>

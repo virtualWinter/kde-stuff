@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kcfg xmlns="http://www.kde.org/standards/kcfg/1.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0 http://www.kde.org/standards/kcfg/1.0/kcfg.xsd">
+  <kcfgfile name=""/>
+  <group name="General">
+    <entry name="iconSize" type="Int">
+      <label>Icon size in pixels (0 = fit panel)</label>
+      <default>0</default>
+      <min>0</min>
+      <max>128</max>
+    </entry>
+    <entry name="spacing" type="Int">
+      <label>Spacing between icons in pixels</label>
+      <default>6</default>
+      <min>0</min>
+      <max>32</max>
+    </entry>
+    <entry name="dotSize" type="Int">
+      <label>Indicator size in pixels</label>
+      <default>5</default>
+      <min>2</min>
+      <max>16</max>
+    </entry>
+    <entry name="focusedIndicatorWidth" type="Int">
+      <label>Width of the line under the focused task in pixels</label>
+      <default>14</default>
+      <min>5</min>
+      <max>64</max>
+    </entry>
+    <entry name="useAccentDot" type="Bool">
+      <label>Use accent color for the indicators (otherwise white)</label>
+      <default>true</default>
+    </entry>
+    <entry name="showAttentionDot" type="Bool">
+      <label>Also show a dot when a task demands attention</label>
+      <default>true</default>
+    </entry>
+    <entry name="minimizeActiveTaskOnClick" type="Bool">
+      <label>Minimize the active task when its icon is clicked</label>
+      <default>true</default>
+    </entry>
+    <entry name="showOnlyCurrentDesktop" type="Bool">
+      <label>Show only tasks from the current desktop</label>
+      <default>true</default>
+    </entry>
+    <entry name="showOnlyCurrentScreen" type="Bool">
+      <label>Show only tasks from the current screen</label>
+      <default>true</default>
+    </entry>
+    <entry name="showOnlyCurrentActivity" type="Bool">
+      <label>Show only tasks from the current activity</label>
+      <default>true</default>
+    </entry>
+    <entry name="showLauncherSeparator" type="Bool">
+      <label>Show a separator between pinned launchers and running apps</label>
+      <default>true</default>
+    </entry>
+    <entry name="launchers" type="StringList">
+      <label>Pinned application URLs (.desktop file URLs)</label>
+      <default></default>
+    </entry>
+  </group>
+</kcfg>

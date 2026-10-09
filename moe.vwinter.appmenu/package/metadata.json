@@ -1,0 +1,25 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Email": "kde@privat.broulik.de",
+                "Name": "Kai Uwe Broulik"
+            },
+            {
+                "Name": "vwinter"
+            }
+        ],
+        "Category": "Windows and Tasks",
+        "Description": "Global menubar with a macOS-style application name at the start (fork of the stock Global Menu).",
+        "FormFactors": [
+            "desktop"
+        ],
+        "Icon": "show-menu",
+        "Name": "v-appmenu",
+        "Version": "0.1.0",
+        "X-Plasma-MainScript": "ui/main.qml",
+        "Id": "moe.vwinter.appmenu"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0"
+}

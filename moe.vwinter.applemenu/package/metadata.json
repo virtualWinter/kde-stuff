@@ -1,0 +1,17 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "vwinter"
+            }
+        ],
+        "Category": "Application Launchers",
+        "Description": "A macOS-style system menu for the panel: system information, settings, recent items, screenshots and session actions.",
+        "Icon": "distributor-logo-apple",
+        "Id": "moe.vwinter.applemenu",
+        "Name": "v-menu",
+        "Version": "0.1.0"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0"
+}
