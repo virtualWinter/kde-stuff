@@ -4,6 +4,8 @@ import org.kde.plasma.core as PlasmaCore
 import org.kde.plasma.extras as PlasmaExtras
 import org.kde.plasma.plasmoid
 
+import org.kde.private.desktopcontainment.folder as Folder
+
 import org.kde.taskmanager as TaskManager
 
 PlasmaExtras.Menu {
@@ -12,6 +14,14 @@ PlasmaExtras.Menu {
     required property /*QModelIndex*/var modelIndex
 
     readonly property var atm: TaskManager.AbstractTasksModel
+
+    // The user's Places (Home, Documents, Trash, drives, ...). Declared as a
+    // property rather than a child: a Menu's default property only accepts
+    // QMenuItem, so a bare child object would fail to load. This is the only
+    // places model exposed to QML.
+    readonly property Folder.PlacesModel placesModel: Folder.PlacesModel {
+        showDesktopEntry: false
+    }
 
     placement: {
         switch (Plasmoid.location) {
@@ -117,7 +127,61 @@ PlasmaExtras.Menu {
         });
     }
 
-    Component.onCompleted: buildAppSections()
+    // The stock task manager adds the user's Places for file managers (its
+    // C++ backend checks the .desktop "FileManager" category). QML cannot
+    // read an app's categories, so this is limited to Dolphin.
+    function isDolphin() {
+        const appId = String(menu.get(menu.atm.AppId) ?? "");
+        return appId === "org.kde.dolphin" || appId === "dolphin";
+    }
+
+    function placeIcon(url) {
+        const s = String(url);
+        if (s.startsWith("trash:")) {
+            return "user-trash";
+        }
+        if (s.startsWith("remote:")) {
+            return "network-workgroup";
+        }
+        if (s.startsWith("recentlyused:")) {
+            return s.indexOf("/locations") >= 0 ? "folder-open-recent" : "document-open-recent";
+        }
+        if (s === "file:///") {
+            return "drive-harddisk";
+        }
+        if (s.startsWith("file:")) {
+            return "folder";
+        }
+        return "network-workgroup";
+    }
+
+    function buildPlaces() {
+        if (!isDolphin()) {
+            return;
+        }
+
+        const count = placesModel.rowCount();
+        if (count <= 0) {
+            return;
+        }
+
+        for (let i = 0; i < count; ++i) {
+            const idx = placesModel.index(i, 0);
+            const url = placesModel.urlForIndex(i);
+            const item = menu.newMenuItem(menu);
+            item.text = String(placesModel.data(idx, Qt.DisplayRole) ?? "");
+            item.icon = placeIcon(url);
+            item.clicked.connect((u => () => tasksModel.requestOpenUrls(menu.modelIndex, [u]))(url));
+            menu.addMenuItem(item, startNewInstanceItem);
+        }
+
+        menu.addMenuItem(menu.newSeparator(menu), startNewInstanceItem);
+    }
+
+    Component.onCompleted: {
+        buildPlaces();
+        buildAppSections();
+    }
 
     PlasmaExtras.MenuItem {
         id: startNewInstanceItem
