@@ -49,10 +49,9 @@ PlasmaExtras.Menu {
     }
 
     function show() {
-        // Built here rather than in Component.onCompleted (like the stock
-        // menu): the static menu items are guaranteed to be in the menu's
-        // content list, so they can be used as insertion anchors.
-        buildPlaces();
+        // Built here rather than in Component.onCompleted, like the stock
+        // menu: the static items are then guaranteed to be in the menu's
+        // content list so they can be used as insertion anchors.
         buildAppSections();
         openRelative();
     }
@@ -93,30 +92,50 @@ PlasmaExtras.Menu {
         }
     }
 
-    // Builds the per-application sections (Recent Files and the app's own
-    // jump list actions) that the stock task manager menu shows.
+    // Mirrors the stock task manager's ContextMenu.loadDynamicLaunchActions():
+    // a Places (or, when there are none, Recent Files) section followed by the
+    // app's jump list Actions, each rendered under a section header when
+    // appropriate. The stock reads these from its C++ backend; here Places
+    // come from the places model and the rest from the Kicker app model.
     function buildAppSections() {
-        const info = root.appActionSections(menu.get(menu.atm.AppId));
-        if (!info) {
-            return;
+        const appId = menu.get(menu.atm.AppId);
+        const info = root.appActionSections(appId);
+        const row = info ? info.row : -1;
+
+        const placesActions = [];
+        if (isDolphin()) {
+            const count = placesModel.rowCount();
+            for (let i = 0; i < count; ++i) {
+                const idx = placesModel.index(i, 0);
+                const url = placesModel.urlForIndex(i);
+                placesActions.push({
+                    "text": String(placesModel.data(idx, Qt.DisplayRole) ?? ""),
+                    "icon": placeIcon(url),
+                    "url": url,
+                });
+            }
         }
 
         const sections = [];
-        if (info.recents.length > 0) {
-            sections.push({ "title": i18n("Recent Files"), "group": "recents", "actions": info.recents });
+        if (placesActions.length > 0) {
+            sections.push({ "title": i18n("Places"), "group": "places", "actions": placesActions });
+        } else {
+            sections.push({ "title": i18n("Recent Files"), "group": "recents", "actions": info ? info.recents : [] });
         }
-        if (info.actions.length > 0) {
-            sections.push({ "title": i18n("Actions"), "group": "actions", "actions": info.actions });
-        }
+        sections.push({ "title": i18n("Actions"), "group": "actions", "actions": info ? info.actions : [] });
 
         sections.forEach(section => {
-            // Like the stock menu: no "Actions" header when it is the only
-            // section.
-            if (section.group !== "actions" || sections.length > 1) {
-                const header = menu.newMenuItem(menu);
-                header.text = section.title;
-                header.section = true;
-                menu.addMenuItem(header, startNewInstanceItem);
+            if (section.actions.length > 0 || section.group === "actions") {
+                // Like the stock menu: no "Actions" header when the menu has
+                // nothing but actions in it.
+                if (section.group !== "actions"
+                        || sections[0].actions.length > 0
+                        || sections[1].actions.length > 0) {
+                    const header = menu.newMenuItem(menu);
+                    header.text = section.title;
+                    header.section = true;
+                    menu.addMenuItem(header, startNewInstanceItem);
+                }
             }
 
             for (let i = 0; i < section.actions.length; ++i) {
@@ -124,9 +143,11 @@ PlasmaExtras.Menu {
                 const item = menu.newMenuItem(menu);
                 item.text = String(action.text ?? "");
                 item.icon = String(action.icon ?? "");
-                item.clicked.connect(() => {
-                    root.triggerAppAction(info.row, String(action.actionId ?? ""), action.actionArgument);
-                });
+                if (action.url !== undefined) {
+                    item.clicked.connect((u => () => tasksModel.requestOpenUrls(menu.modelIndex, [u]))(action.url));
+                } else {
+                    item.clicked.connect((a => () => root.triggerAppAction(row, String(a.actionId ?? ""), a.actionArgument))(action));
+                }
                 menu.addMenuItem(item, startNewInstanceItem);
             }
         });
@@ -167,31 +188,6 @@ PlasmaExtras.Menu {
         }
         return "network-workgroup";
     }
-
-    function buildPlaces() {
-        if (!isDolphin()) {
-            return;
-        }
-
-        const count = placesModel.rowCount();
-        if (count <= 0) {
-            return;
-        }
-
-        for (let i = 0; i < count; ++i) {
-            const idx = placesModel.index(i, 0);
-            const url = placesModel.urlForIndex(i);
-            const item = menu.newMenuItem(menu);
-            item.text = String(placesModel.data(idx, Qt.DisplayRole) ?? "");
-            item.icon = placeIcon(url);
-            item.clicked.connect((u => () => tasksModel.requestOpenUrls(menu.modelIndex, [u]))(url));
-            menu.addMenuItem(item, startNewInstanceItem);
-        }
-
-        menu.addMenuItem(menu.newSeparator(menu), startNewInstanceItem);
-    }
-
-
 
     PlasmaExtras.MenuItem {
         id: startNewInstanceItem
