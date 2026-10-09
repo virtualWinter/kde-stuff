@@ -36,6 +36,8 @@ PlasmoidItem {
 
     readonly property int dotGap: 2
     readonly property int dotSpace: dotSize + dotGap
+    // Show one dot per window, capped at this many.
+    readonly property int maxIndicatorDots: 3
     readonly property int autoIconSize: Math.max(16, Math.floor(
         (vertical ? root.width : root.height) - root.dotSpace - 4))
     readonly property int effectiveIconSize: configuredIconSize > 0 ? configuredIconSize : autoIconSize
@@ -414,6 +416,40 @@ PlasmoidItem {
                     readonly property bool focusedTask: !!model.IsActive
                     readonly property bool attentionTask: root.showAttentionDot && !!model.IsDemandingAttention
 
+                    // Number of windows behind this icon: one for a plain
+                    // window, the child count for a grouped application.
+                    readonly property int windowCount: {
+                        if (model.IsGroupParent) {
+                            return Math.max(1, model.ChildCount);
+                        }
+                        if (model.IsWindow) {
+                            return 1;
+                        }
+                        return 0;
+                    }
+
+                    // One indicator dot per window, capped at maxIndicatorDots.
+                    readonly property int indicatorDotCount: Math.min(windowCount, root.maxIndicatorDots)
+
+                    // Which visible dot represents the active window, so its
+                    // dot can stretch into the focused line.
+                    readonly property int focusedDotIndex: {
+                        if (!focusedTask || indicatorDotCount === 0) {
+                            return -1;
+                        }
+                        if (!model.IsGroupParent) {
+                            return 0;
+                        }
+                        const childCount = tasksModel.rowCount(tasksModel.makeModelIndex(index));
+                        for (let j = 0; j < childCount; ++j) {
+                            if (tasksModel.data(tasksModel.makeModelIndex(index, j),
+                                    TaskManager.AbstractTasksModel.IsActive)) {
+                                return Math.min(j, indicatorDotCount - 1);
+                            }
+                        }
+                        return 0;
+                    }
+
                     // Lift the icon while it is being dragged for reordering.
                     z: reorderHandler.active ? 10 : 0
                     scale: reorderHandler.active ? 1.1 : 1.0
@@ -487,40 +523,51 @@ PlasmoidItem {
                         }
                     }
 
-                    // Indicator: a dot for every running task; the focused
-                    // task's dot stretches into a short line. The transitions
-                    // between the states are animated.
-                    Rectangle {
+                    // Indicator: one dot per window (up to maxIndicatorDots);
+                    // the active window's dot stretches into a short line. The
+                    // transitions between the states are animated.
+                    Row {
                         id: indicator
-
-                        readonly property bool shown: taskDelegate.runningTask
-                        readonly property bool focused: taskDelegate.focusedTask
 
                         anchors.bottom: parent.bottom
                         anchors.horizontalCenter: parent.horizontalCenter
                         height: root.dotSize
-                        radius: height / 2
-                        width: shown ? (focused ? root.focusedIndicatorWidth : root.dotSize) : 0
-                        opacity: shown ? 1 : 0
+                        spacing: root.dotGap
+                        opacity: taskDelegate.runningTask ? 1 : 0
                         visible: opacity > 0
-                        color: (taskDelegate.attentionTask && !focused) ? "#f47629" : root.indicatorColor
 
-                        Behavior on width {
-                            NumberAnimation {
-                                duration: 160
-                                easing.type: Easing.OutCubic
+                        Repeater {
+                            model: taskDelegate.indicatorDotCount
+
+                            delegate: Rectangle {
+                                readonly property bool focusedDot: taskDelegate.focusedTask
+                                    && index === taskDelegate.focusedDotIndex
+
+                                y: Math.round((indicator.height - height) / 2)
+                                height: root.dotSize
+                                radius: height / 2
+                                width: focusedDot ? root.focusedIndicatorWidth : root.dotSize
+                                color: (taskDelegate.attentionTask && !taskDelegate.focusedTask)
+                                    ? "#f47629" : root.indicatorColor
+
+                                Behavior on width {
+                                    NumberAnimation {
+                                        duration: 160
+                                        easing.type: Easing.OutCubic
+                                    }
+                                }
+
+                                Behavior on color {
+                                    ColorAnimation {
+                                        duration: 120
+                                        easing.type: Easing.OutCubic
+                                    }
+                                }
                             }
                         }
 
                         Behavior on opacity {
                             NumberAnimation {
-                                duration: 120
-                                easing.type: Easing.OutCubic
-                            }
-                        }
-
-                        Behavior on color {
-                            ColorAnimation {
                                 duration: 120
                                 easing.type: Easing.OutCubic
                             }

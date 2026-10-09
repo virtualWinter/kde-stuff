@@ -2,9 +2,10 @@
 
 A lightweight QML-only icons-only task manager for KDE Plasma 6.
 
-Every running task is marked with a small dot centered below its icon; the
-focused task's dot becomes a short line. Tasks that demand attention get an
-orange dot. Clicking a grouped icon cycles through its windows.
+Every running task is marked with small dots centered below its icon: one per
+window, capped at three. The focused window's dot becomes a short line. Tasks
+that demand attention get an orange dot. Clicking a grouped icon cycles through
+its windows.
 
 ## Behavior
 
@@ -20,8 +21,9 @@ orange dot. Clicking a grouped icon cycles through its windows.
   takes its launcher's place in the row.
 - A subtle separator divides the pinned apps from the unpinned running ones
   (can be turned off in the settings).
-- Indicators animate: dots fade/scale in for running tasks and the focused
-  task's dot stretches into a line; icons and hover highlights fade smoothly.
+- Indicators animate: dots fade/scale in for running tasks, an extra dot
+  appears per window (up to three), and the focused window's dot stretches
+  into a line; icons and hover highlights fade smoothly.
 
 ## Options
 
