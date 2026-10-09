@@ -49,6 +49,11 @@ PlasmaExtras.Menu {
     }
 
     function show() {
+        // Built here rather than in Component.onCompleted (like the stock
+        // menu): the static menu items are guaranteed to be in the menu's
+        // content list, so they can be used as insertion anchors.
+        buildPlaces();
+        buildAppSections();
         openRelative();
     }
 
@@ -186,10 +191,7 @@ PlasmaExtras.Menu {
         menu.addMenuItem(menu.newSeparator(menu), startNewInstanceItem);
     }
 
-    Component.onCompleted: {
-        buildPlaces();
-        buildAppSections();
-    }
+
 
     PlasmaExtras.MenuItem {
         id: startNewInstanceItem
