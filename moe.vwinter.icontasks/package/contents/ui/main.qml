@@ -134,6 +134,11 @@ PlasmoidItem {
     Kicker.RootModel {
         id: appModel
 
+        // The Kicker model needs the applet interface to build each entry's
+        // action list (jump-list actions and recent documents). Without it the
+        // context menu's app-specific sections come out empty.
+        appletInterface: root
+
         flat: true
         sorted: true
         showAllApps: true
