@@ -7,7 +7,7 @@
             }
         ],
         "Category": "Application Launchers",
-        "Description": "A macOS Launchpad-style fullscreen application grid with paging and search.",
+        "Description": "A macOS Launchpad-style application grid with paging and search.",
         "Icon": "applications-other",
         "Id": "moe.vwinter.launchpad",
         "Name": "v-launchpad",
