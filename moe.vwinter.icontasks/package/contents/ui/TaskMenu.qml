@@ -131,7 +131,10 @@ PlasmaExtras.Menu {
     // C++ backend checks the .desktop "FileManager" category). QML cannot
     // read an app's categories, so this is limited to Dolphin.
     function isDolphin() {
-        const appId = String(menu.get(menu.atm.AppId) ?? "");
+        let appId = String(menu.get(menu.atm.AppId) ?? "");
+        if (appId.endsWith(".desktop")) {
+            appId = appId.slice(0, appId.length - 8);
+        }
         return appId === "org.kde.dolphin" || appId === "dolphin";
     }
 
