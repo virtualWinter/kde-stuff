@@ -1,6 +1,7 @@
 # Build outputs
 moe.vwinter.appmenu/build/
 moe.vwinter.launchpad/build/
+moe.vwinter.systemtray/build/
 
 # Qt/QML caches
 *.qmlc

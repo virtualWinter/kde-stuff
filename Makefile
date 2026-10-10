@@ -7,8 +7,8 @@
 #   make uninstall  remove all add-ons
 #   make clean      remove build outputs
 
-ADDONS := moe.vwinter.applemenu moe.vwinter.launchpad moe.vwinter.icontasks moe.vwinter.appmenu
-COMPILED := moe.vwinter.appmenu moe.vwinter.launchpad
+ADDONS := moe.vwinter.applemenu moe.vwinter.launchpad moe.vwinter.icontasks moe.vwinter.appmenu moe.vwinter.systemtray
+COMPILED := moe.vwinter.appmenu moe.vwinter.launchpad moe.vwinter.systemtray
 PLUGIN_DIR := $(HOME)/.local/lib/qt6/plugins
 
 .PHONY: all build install plugin uninstall restart clean
