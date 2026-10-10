@@ -618,19 +618,8 @@ PlasmaExtras.Menu {
 
     PlasmaExtras.MenuItem { separator: true }
 
-    PlasmaExtras.MenuItem {
-        property PlasmaCore.Action configureAction: null
-
-        enabled: configureAction && configureAction.enabled
-        visible: configureAction && configureAction.visible
-        text: configureAction ? configureAction.text : ""
-        icon: configureAction ? configureAction.icon : ""
-
-        onClicked: configureAction.trigger()
-
-        Component.onCompleted: configureAction = Plasmoid.internalAction("configure")
-    }
-
+    // The widget's own "Configure …" entry is intentionally omitted; configure
+    // the widget from the panel's edit mode instead.
     PlasmaExtras.MenuItem {
         property PlasmaCore.Action editModeAction: null
 
