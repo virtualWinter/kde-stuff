@@ -15,6 +15,10 @@ PlasmaExtras.Menu {
 
     readonly property var atm: TaskManager.AbstractTasksModel
 
+    // The "all activities" UUID. ActivityInfo no longer exposes nullUuid in
+    // this Plasma version, so use the well-known all-zero UUID instead.
+    readonly property string allActivitiesUuid: "00000000-0000-0000-0000-000000000000"
+
     // The user's Places (Home, Documents, Trash, drives, ...). Declared as a
     // property rather than a child: a Menu's default property only accepts
     // QMenuItem, so a bare child object would fail to load. This is the only
@@ -424,7 +428,8 @@ PlasmaExtras.Menu {
 
         function doesBelongToCurrentActivity() {
             return tasksModel.launcherActivities(menu.get(menu.atm.LauncherUrlWithoutIcon))
-                .some(activity => activity === activityInfo.currentActivity || activity === activityInfo.nullUuid);
+                .some(activity => activity === activityInfo.currentActivity
+                    || activity === allActivitiesUuid);
         }
 
         onClicked: {
@@ -475,7 +480,7 @@ PlasmaExtras.Menu {
                 const url = menu.get(menu.atm.LauncherUrlWithoutIcon);
                 const activities = tasksModel.launcherActivities(url);
 
-                createNewItem(activityInfo.nullUuid, i18nc("action:inmenu", "On All Activities"), "", url, activities);
+                createNewItem(allActivitiesUuid, i18nc("action:inmenu", "On All Activities"), "", url, activities);
 
                 if (activityInfo.numberOfRunningActivities <= 1) {
                     return;
