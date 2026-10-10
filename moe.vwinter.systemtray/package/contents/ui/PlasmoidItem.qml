@@ -190,7 +190,14 @@ AbstractItem {
 
     Binding {
         property: "hideOnWindowDeactivate"
-        value: !Plasmoid.configuration.pin
+        // Upstream ties this to Plasmoid.configuration.pin, which makes every
+        // tray item tear its own popup down as soon as the tray popup takes
+        // window activation (main.qml's onVisibleChanged calls
+        // dialog.requestActivate()). Collapsing the item's expanded state then
+        // collapses the whole tray again, so the popup only flashes for a frame.
+        // The tray popup owns that behaviour itself via its own
+        // hideOnWindowDeactivate, so the items must not opt into it themselves.
+        value: false
         target: plasmoidContainer.applet
         when: plasmoidContainer.applet !== null
         restoreMode: Binding.RestoreBinding
