@@ -69,7 +69,9 @@ AbstractItem {
         color: systemTrayState.expanded
             ? Kirigami.Theme.highlightColor
             : Qt.alpha(Kirigami.Theme.highlightColor, 0.4)
-        radius: thickness / 2
+        // Each delegate draws one segment; square ends make adjacent segments
+        // meet without antialiased gaps.
+        radius: 0
 
         // A vertical panel underlines on the side the icons emerge from.
         x: root.vertical ? parent.width - thickness : 0
