@@ -37,12 +37,13 @@ AbstractItem {
         "org.kde.plasma.bluetooth",
         "org.kde.plasma.volume",
         "org.kde.plasma.brightness",
+        "org.kde.plasma.battery",
         "org.kde.plasma.notifications"
     ].includes(itemId)
 
     /*
      * Those same icons open the control center instead of the applet's popup.
-     * The applets it does not cover (clipboard, weather, battery and friends)
+     * The applets it does not cover (clipboard, weather, vault and friends)
      * keep theirs, and items sitting in the hidden area keep theirs as well,
      * since the control center cannot replace an applet that is not
      * represented in it.

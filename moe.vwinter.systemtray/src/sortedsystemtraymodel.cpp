@@ -27,6 +27,7 @@ static const QList<QString> s_controlCenterOrder = {
     QStringLiteral("org.kde.plasma.bluetooth"),
     QStringLiteral("org.kde.plasma.volume"),
     QStringLiteral("org.kde.plasma.brightness"),
+    QStringLiteral("org.kde.plasma.battery"),
     QStringLiteral("org.kde.plasma.notifications"),
 };
 
