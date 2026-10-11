@@ -36,21 +36,6 @@ Item {
 
     focus: true
 
-    /*
-     * The popup sits on the same dark tone as the panel. The theme's dialog
-     * background is lighter than the panel in most themes, so the dialog is
-     * told to draw nothing and the control center owns its surface instead.
-     */
-    Rectangle {
-        id: background
-
-        anchors.fill: parent
-        color: Kirigami.Theme.backgroundColor
-        radius: Kirigami.Units.gridUnit / 2
-        border.width: 1
-        border.color: Qt.alpha(Kirigami.Theme.textColor, 0.12)
-    }
-
     // Role numbers from BaseModel::BaseRole in src/systemtraymodel.h:
     // ItemType = Qt::UserRole + 1, ItemId = +2, EffectiveStatus = +6.
     function isVisibleSystemApplet(sourceModel, sourceRow, sourceParent, itemId) {

@@ -251,9 +251,13 @@ ContainmentItem {
             visible: systemTrayState.expanded
             appletInterface: root
 
-            // The control center draws its own background, in the tone of the
-            // panel, instead of the theme's dialog background.
+            // The control center draws no theme background: the dialog is told
+            // to skip it, and the window itself is painted in the tone of the
+            // panel. The dialog keeps laying the main item out inside the
+            // frame margins, so painting the window is what keeps that strip
+            // from showing the window's default colour.
             backgroundHints: PlasmaCore.Types.NoBackground
+            color: Kirigami.Theme.backgroundColor
 
             onVisibleChanged: {
                 if (!visible) {
