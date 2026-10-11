@@ -99,7 +99,9 @@ plasma_add_applet(moe.vwinter.systemtray
         package/contents/ui/AbstractItem.qml
         package/contents/ui/BackgroundAppItem.qml
         package/contents/ui/ConfigGeneral.qml
-        package/contents/ui/CurrentItemHighLight.qml
+        package/contents/ui/ControlCenter.qml
+        package/contents/ui/ControlTile.qml
+        package/contents/ui/NotificationsSection.qml
         package/contents/ui/ExpanderArrow.qml
         package/contents/ui/ItemLoader.qml
         package/contents/ui/PlasmoidItem.qml
@@ -107,10 +109,7 @@ plasma_add_applet(moe.vwinter.systemtray
         package/contents/ui/SystemTrayState.qml
         package/contents/ui/CompactApplet.qml
         package/contents/ui/config.qml
-        package/contents/ui/ExpandedRepresentation.qml
-        package/contents/ui/HiddenItemsView.qml
         package/contents/ui/main.qml
-        package/contents/ui/PlasmoidPopupsContainer.qml
         package/contents/ui/StatusNotifierItem.qml
     RESOURCES
         package/contents/config/main.xml

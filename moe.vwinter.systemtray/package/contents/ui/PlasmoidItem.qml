@@ -111,22 +111,11 @@ AbstractItem {
         return item.children.find(__isSuitableMouseArea) ?? null;
     }
 
-    //This is to make preloading effective, minimizes the scene changes
-    function preloadFullRepresentationItem(fullRepresentationItem) {
-        if (fullRepresentationItem && fullRepresentationItem.parent === null) {
-            fullRepresentationItem.width = expandedRepresentation.width
-            fullRepresentationItem.height = expandedRepresentation.height
-            fullRepresentationItem.parent = preloadedStorage;
-        }
-    }
-
     onAppletChanged: {
         if (applet) {
             applet.parent = iconContainer
             applet.anchors.fill = applet.parent
             applet.visible = true
-
-            preloadFullRepresentationItem(applet.fullRepresentationItem)
         }
     }
 
@@ -164,10 +153,6 @@ AbstractItem {
 
     Connections {
         target: plasmoidContainer.applet
-
-        function onFullRepresentationItemChanged(fullRepresentationItem) {
-            plasmoidContainer.preloadFullRepresentationItem(fullRepresentationItem)
-        }
 
         function onExpandedChanged(expanded) {
             if (expanded) {

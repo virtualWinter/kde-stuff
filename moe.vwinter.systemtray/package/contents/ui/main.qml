@@ -32,19 +32,8 @@ ContainmentItem {
     readonly property alias systemTrayState: systemTrayState
     readonly property alias itemSize: tasksGrid.itemSize
     readonly property alias visibleLayout: tasksGrid
-    readonly property alias hiddenLayout: expandedRepresentation.hiddenLayout
+    readonly property alias hiddenItemCount: controlCenter.tileCount
     readonly property bool oneRowOrColumn: tasksGrid.rowsOrColumns === 1
-
-    readonly property alias hiddenModel: hiddenModel
-
-    Component.onCompleted: {
-        // We need all the plasmoiditems to be there for correct working of shortcuts.
-        // Instantiators create the plasmoiditems: ensure this is done after
-        // this containmentitem actually  exists so they can be immediately parented properly
-        // set active and not the model, as this will cause an assert deep in Qt
-        activeInstantiator.active = true;
-        hiddenInstantiator.active = true;
-    }
 
     Connections {
         target: Plasmoid
@@ -63,50 +52,6 @@ ContainmentItem {
         Component.onCompleted: sourceModel = Plasmoid.systemTrayModel // avoid unnecessary binding, it causes loops
     }
 
-    KItemModels.KSortFilterProxyModel {
-        id: hiddenModel
-        filterRoleName: "effectiveStatus"
-        filterRowCallback: (sourceRow, sourceParent) => {
-            let value = sourceModel.data(sourceModel.index(sourceRow, 0, sourceParent), filterRole);
-            return value === PlasmaCore.Types.PassiveStatus
-        }
-        Component.onCompleted: sourceModel = Plasmoid.systemTrayModel // avoid unnecessary binding, it causes loops
-    }
-
-    Instantiator {
-        id: hiddenInstantiator
-        // It's important that those are inactive at creation time
-        // to not create plasmoiditems too soon
-        active: false
-        model: hiddenModel
-        delegate: Connections {
-            required property QtObject applet
-            required property int row
-            target: applet
-            function onExpandedChanged(expanded: bool) {
-                if (expanded) {
-                    systemTrayState.setActiveApplet(applet, row)
-                }
-            }
-        }
-    }
-
-    Instantiator {
-        id: activeInstantiator
-        active: false
-        model:activeModel
-        delegate: Connections {
-            required property QtObject applet
-            required property int row
-            target: applet
-            function onExpandedChanged(expanded: bool) {
-                if (expanded) {
-                    systemTrayState.setActiveApplet(applet, row)
-                }
-            }
-        }
-    }
-
     MouseArea {
         anchors.fill: parent
 
@@ -117,11 +62,6 @@ ContainmentItem {
 
         SystemTrayState {
             id: systemTrayState
-        }
-
-        CurrentItemHighLight {
-            location: Plasmoid.location
-            parent: root
         }
 
         DnD.DropArea {
@@ -264,7 +204,7 @@ ContainmentItem {
                 Layout.fillHeight: !vertical
                 Layout.alignment: vertical ? Qt.AlignVCenter : Qt.AlignHCenter
                 iconSize: tasksGrid.itemSize
-                visible: root.hiddenLayout.itemCount > 0
+                visible: root.hiddenItemCount > 0
             }
         }
 
@@ -319,26 +259,11 @@ ContainmentItem {
                     expandedSync.restart();
                 } else {
                     dialog.requestActivate();
-                    if (expandedRepresentation.plasmoidContainer.visible) {
-                        expandedRepresentation.plasmoidContainer.forceActiveFocus();
-                    } else if (expandedRepresentation.hiddenLayout.visible) {
-                        expandedRepresentation.hiddenLayout.forceActiveFocus();
-                    }
+                    controlCenter.forceActiveFocus();
                 }
             }
-            mainItem: ExpandedRepresentation {
-                id: expandedRepresentation
-
-                Keys.onEscapePressed: event => {
-                    systemTrayState.expanded = false
-                }
-
-                // Being there forces the items to fully load, and they will be reparented in the stack one by one, this item is *never* visible
-                // it's important this item is parented to the popup, otherwise the full representation will be reparented every time the popup opens or closes
-                Item {
-                    id: preloadedStorage
-                    visible: false
-                }
+            mainItem: ControlCenter {
+                id: controlCenter
 
                 // Draws a line between the applet dialog and the panel
                 KSvg.SvgItem {
@@ -347,6 +272,8 @@ ContainmentItem {
                     visible: [PlasmaCore.Types.TopEdge, PlasmaCore.Types.LeftEdge, PlasmaCore.Types.RightEdge, PlasmaCore.Types.BottomEdge]
                         .includes(Plasmoid.location) && !dialog.margin
                     anchors {
+                        left: parent.left
+                        right: parent.right
                         topMargin: -dialog.topPadding
                         leftMargin: -dialog.leftPadding
                         rightMargin: -dialog.rightPadding

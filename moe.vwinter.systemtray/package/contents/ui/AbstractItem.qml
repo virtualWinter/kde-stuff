@@ -74,14 +74,8 @@ PlasmaCore.ToolTipArea {
         // index in a scrollable view also changes the view position.
         // onEntered will change the index while the items are scrolling,
         // making it harder to scroll.
-        onPositionChanged: if (abstractItem.inHiddenLayout) {
-            root.hiddenLayout.currentIndex = abstractItem.index
-        }
         onClicked: mouse => { abstractItem.clicked(mouse) }
         onPressed: mouse => {
-            if (abstractItem.inHiddenLayout) {
-                root.hiddenLayout.currentIndex = abstractItem.index
-            }
             abstractItem.hideImmediately()
             abstractItem.pressed(mouse)
         }
@@ -109,7 +103,7 @@ PlasmaCore.ToolTipArea {
             scale: (abstractItem.effectivePressed || mouseArea.containsPress) ? 0.8 : 1
 
             activeFocusOnTab: !abstractItem.inHiddenLayout
-            focus: true // Required in HiddenItemsView so keyboard events can be forwarded to this item
+            focus: true // Required so keyboard events can be forwarded to this item
             Accessible.name: abstractItem.text
             Accessible.description: abstractItem.subText
             Accessible.role: Accessible.Button

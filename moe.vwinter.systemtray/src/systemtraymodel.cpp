@@ -164,6 +164,8 @@ QVariant PlasmoidModel::data(const QModelIndex &index, int role) const
         return applet ? QVariant::fromValue(PlasmaQuick::AppletQuickItem::itemForApplet(applet)) : QVariant();
     case Role::HasApplet:
         return applet != nullptr;
+    case Role::IconName:
+        return applet ? applet->icon() : pluginMetaData.iconName();
     default:
         return {};
     }
@@ -180,6 +182,7 @@ QHash<int, QByteArray> PlasmoidModel::roleNames() const
 
     roles.insert(static_cast<int>(Role::Applet), QByteArrayLiteral("applet"));
     roles.insert(static_cast<int>(Role::HasApplet), QByteArrayLiteral("hasApplet"));
+    roles.insert(static_cast<int>(Role::IconName), QByteArrayLiteral("iconName"));
 
     return roles;
 }

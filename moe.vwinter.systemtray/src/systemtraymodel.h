@@ -72,6 +72,7 @@ public:
     enum class Role {
         Applet = static_cast<int>(BaseModel::BaseRole::LastBaseRole) + 1,
         HasApplet,
+        IconName,
     };
 
     explicit PlasmoidModel(const QPointer<SystemTraySettings> &settings, const QPointer<PlasmoidRegistry> &plasmoidRegistry, QObject *parent = nullptr);
