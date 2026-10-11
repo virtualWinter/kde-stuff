@@ -64,6 +64,20 @@ Item {
         Component.onCompleted: sourceModel = Plasmoid.systemTrayModel
     }
 
+    /*
+     * One surface for the whole popup, behind both the heading and the
+     * content. The popup window has no theme background of its own
+     * (NoBackground), so without this the window shows through and the
+     * heading's own themed background would sit in a different tone above
+     * the cards.
+     */
+    Rectangle {
+        id: background
+
+        anchors.fill: parent
+        color: Kirigami.Theme.backgroundColor
+    }
+
     PlasmaExtras.PlasmoidHeading {
         id: heading
 
@@ -73,6 +87,10 @@ Item {
             right: parent.right
         }
         height: headerRow.height + bottomPadding
+
+        // The surface above draws the popup's tone; the heading's themed
+        // background would only reintroduce a second tone.
+        background.visible: false
     }
 
     ColumnLayout {
