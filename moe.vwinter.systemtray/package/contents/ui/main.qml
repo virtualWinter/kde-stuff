@@ -251,7 +251,9 @@ ContainmentItem {
             visible: systemTrayState.expanded
             appletInterface: root
 
-            backgroundHints: (Plasmoid.containmentDisplayHints & PlasmaCore.Types.ContainmentPrefersOpaqueBackground) ? PlasmaCore.AppletPopup.SolidBackground : PlasmaCore.AppletPopup.StandardBackground
+            // The control center draws its own background, in the tone of the
+            // panel, instead of the theme's dialog background.
+            backgroundHints: PlasmaCore.Types.NoBackground
 
             onVisibleChanged: {
                 if (!visible) {
