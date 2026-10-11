@@ -97,18 +97,25 @@ plasma_add_applet(moe.vwinter.systemtray
         src/systemtray.cpp
     QML_SOURCES
         package/contents/ui/AbstractItem.qml
+        package/contents/ui/AppletModule.qml
         package/contents/ui/AudioQuickControl.qml
         package/contents/ui/BackgroundAppItem.qml
+        package/contents/ui/BrightnessModule.qml
         package/contents/ui/ConfigGeneral.qml
         package/contents/ui/ControlCenter.qml
         package/contents/ui/BrightnessQuickControl.qml
         package/contents/ui/ControlTile.qml
+        package/contents/ui/DndModule.qml
+        package/contents/ui/GridCenter.qml
+        package/contents/ui/GridModule.qml
+        package/contents/ui/MediaModule.qml
         package/contents/ui/NotificationsSection.qml
         package/contents/ui/ExpanderArrow.qml
         package/contents/ui/ItemLoader.qml
         package/contents/ui/PlasmoidItem.qml
         package/contents/ui/PulseAnimation.qml
         package/contents/ui/QuickSettingCard.qml
+        package/contents/ui/SoundModule.qml
         package/contents/ui/SystemTrayState.qml
         package/contents/ui/CompactApplet.qml
         package/contents/ui/config.qml

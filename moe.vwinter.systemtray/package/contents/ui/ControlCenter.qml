@@ -16,16 +16,17 @@ import org.kde.plasma.extras as PlasmaExtras
 import org.kde.plasma.plasmoid
 
 /*
- * The Control Center popup:
- *   Wi-Fi | Bluetooth action tiles
- *   Sound (volume, mute, output picker)
- *   Brightness
- *   Notifications
+ * The Control Center popup. It offers two layouts, selected in the applet
+ * configuration:
+ *   Compact - Wi-Fi and Bluetooth tiles, the Sound and Brightness quick
+ *             controls and the docked notification list
+ *   Grid    - a module grid with per-module sizes
  */
 Item {
     id: controlCenter
 
     readonly property string notificationsAppletId: "org.kde.plasma.notifications"
+    readonly property bool gridMode: Plasmoid.configuration.layoutStyle === 1
 
     implicitWidth: Kirigami.Units.gridUnit * 22
     implicitHeight: Math.max(Kirigami.Units.gridUnit * 12,
@@ -144,6 +145,7 @@ Item {
             Layout.fillHeight: false
             Layout.leftMargin: Kirigami.Units.smallSpacing
             Layout.rightMargin: Kirigami.Units.smallSpacing
+            visible: !controlCenter.gridMode
             spacing: Kirigami.Units.smallSpacing
 
             Repeater {
@@ -174,15 +176,18 @@ Item {
         AudioQuickControl {
             Layout.leftMargin: Kirigami.Units.smallSpacing
             Layout.rightMargin: Kirigami.Units.smallSpacing
+            visible: !controlCenter.gridMode
         }
 
         BrightnessQuickControl {
             Layout.leftMargin: Kirigami.Units.smallSpacing
             Layout.rightMargin: Kirigami.Units.smallSpacing
+            visible: !controlCenter.gridMode
         }
 
         Kirigami.Separator {
             Layout.fillWidth: true
+            visible: !controlCenter.gridMode
         }
 
         NotificationsSection {
@@ -191,6 +196,20 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.minimumHeight: implicitHeight
+            visible: !controlCenter.gridMode
+        }
+
+        GridCenter {
+            id: grid
+
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.leftMargin: Kirigami.Units.smallSpacing
+            Layout.rightMargin: Kirigami.Units.smallSpacing
+            Layout.topMargin: Kirigami.Units.smallSpacing
+            visible: controlCenter.gridMode
+
+            onAppletPopupLaunched: systemTrayState.expanded = false
         }
     }
 

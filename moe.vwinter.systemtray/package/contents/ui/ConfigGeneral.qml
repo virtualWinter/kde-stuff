@@ -38,6 +38,70 @@ KCMUtils.ScrollViewKCM {
     property list<string> cfg_extraItems: []
     property list<string> cfg_disabledStatusNotifiers: []
 
+    property int cfg_layoutStyle
+    property int cfg_wifiModuleSize
+    property int cfg_bluetoothModuleSize
+    property int cfg_soundModuleSize
+    property int cfg_brightnessModuleSize
+    property int cfg_dndModuleSize
+    property int cfg_mediaModuleSize
+    property int cfg_notificationsModuleSize
+
+    // The quick settings of the popup, each with its own size in the grid.
+    readonly property var moduleSizeModel: [
+        {
+            "label": i18nc("@label:listbox Control center module", "Wi-Fi"), // qmllint disable unqualified
+            "key": "wifiModuleSize"
+        },
+        {
+            "label": i18nc("@label:listbox Control center module", "Bluetooth"), // qmllint disable unqualified
+            "key": "bluetoothModuleSize"
+        },
+        {
+            "label": i18nc("@label:listbox Control center module", "Media"), // qmllint disable unqualified
+            "key": "mediaModuleSize"
+        },
+        {
+            "label": i18nc("@label:listbox Control center module", "Sound"), // qmllint disable unqualified
+            "key": "soundModuleSize"
+        },
+        {
+            "label": i18nc("@label:listbox Control center module", "Brightness"), // qmllint disable unqualified
+            "key": "brightnessModuleSize"
+        },
+        {
+            "label": i18nc("@label:listbox Control center module", "Do Not Disturb"), // qmllint disable unqualified
+            "key": "dndModuleSize"
+        },
+        {
+            "label": i18nc("@label:listbox Control center module", "Notifications"), // qmllint disable unqualified
+            "key": "notificationsModuleSize"
+        }
+    ]
+
+    readonly property var moduleSizesModel: [
+        {
+            "text": i18nc("@item:inlistbox Module size", "Default"), // qmllint disable unqualified
+            "value": 0
+        },
+        {
+            "text": i18nc("@item:inlistbox Module size", "Small"), // qmllint disable unqualified
+            "value": 1
+        },
+        {
+            "text": i18nc("@item:inlistbox Module size", "Wide"), // qmllint disable unqualified
+            "value": 2
+        },
+        {
+            "text": i18nc("@item:inlistbox Module size", "Large"), // qmllint disable unqualified
+            "value": 3
+        },
+        {
+            "text": i18nc("@item:inlistbox Module size", "Full width"), // qmllint disable unqualified
+            "value": 4
+        }
+    ]
+
     // We can share one combobox model across all delegates, they all have the same options
     readonly property var comboBoxModel: {
         const autoElement = {
@@ -300,6 +364,77 @@ KCMUtils.ScrollViewKCM {
 
                 currentIndex: iconsPage.cfg_reverseIconOrder ? 1 : 0
                 onActivated: iconsPage.cfg_reverseIconOrder = currentValue;
+            }
+
+            QQC2.ComboBox {
+                id: popupLayoutChooser
+
+                Kirigami.FormData.label: i18nc("@label:listbox How the items of the system tray popup are arranged", "Popup layout:") // qmllint disable unqualified
+                Layout.preferredWidth: formLayout.maxComboboxWidth
+
+                textRole: "text"
+                valueRole: "value"
+
+                model: [
+                    {
+                        "text": i18nc("@item:inlistbox Popup layout", "Compact list"), // qmllint disable unqualified
+                        "value": 0
+                    },
+                    {
+                        "text": i18nc("@item:inlistbox Popup layout", "Module grid"), // qmllint disable unqualified
+                        "value": 1
+                    }
+                ]
+
+                currentIndex: Math.max(0, iconsPage.cfg_layoutStyle)
+                onActivated: iconsPage.cfg_layoutStyle = currentValue
+            }
+
+            Kirigami.FormData.label: i18nc("@label Group of settings about the size of the popup modules", "Module size:") // qmllint disable unqualified
+            visible: iconsPage.cfg_layoutStyle === 1
+
+            GridLayout {
+                id: moduleSizeLayout
+
+                visible: iconsPage.cfg_layoutStyle === 1
+                columns: 1
+                columnSpacing: Kirigami.Units.smallSpacing
+                rowSpacing: Kirigami.Units.smallSpacing
+
+                Repeater {
+                    model: iconsPage.moduleSizeModel
+
+                    delegate: RowLayout {
+                        id: moduleRow
+
+                        required property string label
+                        required property string key
+
+                        Layout.fillWidth: true
+                        spacing: Kirigami.Units.smallSpacing
+
+                        QQC2.Label {
+                            Layout.preferredWidth: Kirigami.Units.gridUnit * 6
+                            horizontalAlignment: Text.AlignRight
+                            text: moduleRow.label
+                        }
+
+                        QQC2.ComboBox {
+                            Layout.preferredWidth: formLayout.maxComboboxWidth
+
+                            textRole: "text"
+                            valueRole: "value"
+                            model: iconsPage.moduleSizesModel
+
+                            currentIndex: Math.max(0, Number(iconsPage["cfg_" + moduleRow.key]))
+                            onActivated: iconsPage["cfg_" + moduleRow.key] = currentValue
+                        }
+
+                        Item {
+                            Layout.fillWidth: true
+                        }
+                    }
+                }
             }
 
             QQC2.Label {

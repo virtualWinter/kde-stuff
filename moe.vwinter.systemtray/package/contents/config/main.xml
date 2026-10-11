@@ -45,6 +45,38 @@
       <label>Whether the popup should remain open when another window is activated</label>
       <default>false</default>
     </entry>
+    <entry name="layoutStyle" type="Int">
+      <label>Layout of the popup: 0 is the compact stacked list, 1 is the module grid</label>
+      <default>0</default>
+    </entry>
+    <entry name="wifiModuleSize" type="Int">
+      <label>Grid size of the Wi-Fi module: 0 auto, 1 small, 2 wide, 3 large, 4 full width</label>
+      <default>0</default>
+    </entry>
+    <entry name="bluetoothModuleSize" type="Int">
+      <label>Grid size of the Bluetooth module: 0 auto, 1 small, 2 wide, 3 large, 4 full width</label>
+      <default>0</default>
+    </entry>
+    <entry name="soundModuleSize" type="Int">
+      <label>Grid size of the Sound module: 0 auto, 1 small, 2 wide, 3 large, 4 full width</label>
+      <default>0</default>
+    </entry>
+    <entry name="brightnessModuleSize" type="Int">
+      <label>Grid size of the Brightness module: 0 auto, 1 small, 2 wide, 3 large, 4 full width</label>
+      <default>0</default>
+    </entry>
+    <entry name="dndModuleSize" type="Int">
+      <label>Grid size of the Do Not Disturb module: 0 auto, 1 small, 2 wide, 3 large, 4 full width</label>
+      <default>0</default>
+    </entry>
+    <entry name="mediaModuleSize" type="Int">
+      <label>Grid size of the media module: 0 auto, 1 small, 2 wide, 3 large, 4 full width</label>
+      <default>0</default>
+    </entry>
+    <entry name="notificationsModuleSize" type="Int">
+      <label>Grid size of the notifications module: 0 auto, 1 small, 2 wide, 3 large, 4 full width</label>
+      <default>0</default>
+    </entry>
   </group>
 
 </kcfg>
