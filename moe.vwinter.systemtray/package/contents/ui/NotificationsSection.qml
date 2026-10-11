@@ -6,6 +6,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import QtQuick.Layouts
 
 import org.kde.kirigami as Kirigami
 import org.kde.plasma.components as PlasmaComponents3
@@ -24,18 +25,18 @@ Item {
 
     readonly property string notificationsAppletId: "org.kde.plasma.notifications"
     readonly property int maximumHeight: Kirigami.Units.gridUnit * 12
-    readonly property int emptyHeight: Kirigami.Units.gridUnit * 3
 
     property Item applet: null
     property Item notificationList: null
 
+    // The stock representation is taller than its bare header once it has
+    // notifications to show.
     readonly property bool hasNotificationContent: notificationList
-        && notificationList.implicitHeight > 0
-    implicitHeight: (hasNotificationContent
-        ? heading.height
-        : emptyHeight) + (hasNotificationContent
-        ? Math.min(notificationList.implicitHeight, maximumHeight)
-        : 0)
+        && notificationList.implicitHeight > Kirigami.Units.gridUnit * 2
+    implicitHeight: heading.height + Kirigami.Units.smallSpacing
+        + (hasNotificationContent
+            ? Math.min(notificationList.implicitHeight, maximumHeight)
+            : emptyState.implicitHeight)
 
     KItemModels.KSortFilterProxyModel {
         id: notificationsModel
@@ -94,7 +95,7 @@ Item {
         }
     }
 
-    PlasmaComponents3.Label {
+    ColumnLayout {
         id: emptyState
 
         anchors {
@@ -102,14 +103,24 @@ Item {
             left: parent.left
             right: parent.right
             topMargin: Kirigami.Units.smallSpacing
-            leftMargin: Kirigami.Units.smallSpacing
-            rightMargin: Kirigami.Units.smallSpacing
         }
         visible: !section.hasNotificationContent
-        text: i18n("No new notifications")
-        height: Kirigami.Units.gridUnit
-        horizontalAlignment: Text.AlignHCenter
-        opacity: 0.65
+        spacing: Kirigami.Units.smallSpacing
+
+        Kirigami.Icon {
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: Kirigami.Units.iconSizes.smallMedium
+            Layout.preferredHeight: Layout.preferredWidth
+            source: "notifications-disabled"
+            opacity: 0.5
+        }
+
+        PlasmaComponents3.Label {
+            Layout.fillWidth: true
+            text: i18n("No new notifications")
+            horizontalAlignment: Text.AlignHCenter
+            opacity: 0.65
+        }
     }
 
     function syncNotificationList() {

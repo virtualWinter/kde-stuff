@@ -11,8 +11,13 @@ import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
 import org.kde.plasma.components as PlasmaComponents3
 
-/* A compact action tile for a stock tray applet popup. */
-Rectangle {
+/*
+ * A compact action tile. Tapping it opens the stock applet's own popup, which
+ * is the only reliable way to drive complex applets such as the network and
+ * bluetooth ones. The model roles are read through a plain root object: the
+ * delegate model only initializes required properties declared there.
+ */
+Item {
     id: tile
 
     required property var model
@@ -24,15 +29,19 @@ Rectangle {
     readonly property string title: applet && applet.Plasmoid && applet.Plasmoid.title
         ? applet.Plasmoid.title
         : (model.displayText ?? "")
-    readonly property string subtitle: applet ? (applet.toolTipMainText ?? "") : ""
+    readonly property string subtitle: {
+        // The applet tooltip repeats the title when it has nothing to add.
+        const lines = (applet?.toolTipSubText ?? "").split("\n");
+        const first = lines[0].trim();
+        return first === "" || first === title ? "" : first;
+    }
 
-    implicitHeight: Kirigami.Units.gridUnit * 4
-
-    color: Qt.alpha(Kirigami.Theme.textColor, hoverHandler.hovered ? 0.12 : 0.06)
-    radius: Kirigami.Units.gridUnit * 0.6
+    Layout.fillWidth: true
+    implicitHeight: Math.max(Kirigami.Units.gridUnit * 4,
+                             rowContent.implicitHeight + Kirigami.Units.smallSpacing * 4)
 
     HoverHandler {
-        id: hoverHandler
+        id: tileHover
         cursorShape: Qt.PointingHandCursor
     }
 
@@ -45,15 +54,24 @@ Rectangle {
         }
     }
 
-    RowLayout {
+    QuickSettingCard {
+        id: card
+
         anchors.fill: parent
-        anchors.margins: Kirigami.Units.smallSpacing
+        color: Qt.alpha(Kirigami.Theme.textColor, tileHover.hovered ? 0.12 : 0.06)
+    }
+
+    RowLayout {
+        id: rowContent
+
+        anchors.fill: card
+        anchors.margins: Kirigami.Units.smallSpacing * 2
         spacing: Kirigami.Units.smallSpacing
 
         Kirigami.Icon {
             Layout.preferredWidth: Kirigami.Units.iconSizes.medium
             Layout.preferredHeight: Layout.preferredWidth
-            source: model.iconName ?? ""
+            source: tile.model.iconName ?? ""
         }
 
         ColumnLayout {
@@ -74,7 +92,7 @@ Rectangle {
                 text: tile.subtitle
                 elide: Text.ElideRight
                 maximumLineCount: 1
-                opacity: 0.7
+                opacity: 0.65
             }
         }
     }

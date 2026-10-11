@@ -13,80 +13,81 @@ import org.kde.plasma.components as PlasmaComponents3
 import org.kde.plasma.private.brightnesscontrolplugin
 
 /*
- * A direct screen-brightness slider. It uses the same ScreenBrightnessControl
- * backend as org.kde.plasma.brightness but avoids its separate popup lifecycle.
+ * The Brightness quick control. It drives the same ScreenBrightnessControl
+ * backend as org.kde.plasma.brightness, without that applet's popup.
  */
-Rectangle {
-    id: card
-
-    Layout.fillWidth: true
-    Layout.preferredHeight: implicitHeight
-    implicitHeight: content.implicitHeight + Kirigami.Units.smallSpacing * 2
-
-    color: Qt.alpha(Kirigami.Theme.textColor, 0.06)
-    radius: Kirigami.Units.gridUnit * 0.6
+QuickSettingCard {
+    id: brightness
 
     ScreenBrightnessControl {
         id: screenBrightnessControl
         isSilent: true
     }
 
-    ColumnLayout {
-        id: content
-
-        anchors.fill: parent
-        anchors.margins: Kirigami.Units.smallSpacing
+    RowLayout {
+        Layout.fillWidth: true
         spacing: Kirigami.Units.smallSpacing
+
+        Kirigami.Icon {
+            Layout.preferredWidth: Kirigami.Units.iconSizes.medium
+            Layout.preferredHeight: Layout.preferredWidth
+            source: "video-display-brightness"
+        }
 
         PlasmaComponents3.Label {
             Layout.fillWidth: true
             text: i18n("Brightness")
+            elide: Text.ElideRight
+            maximumLineCount: 1
             font.weight: Font.DemiBold
         }
+    }
 
-        Repeater {
-            model: screenBrightnessControl.displays
+    Repeater {
+        model: screenBrightnessControl.displays
 
-            delegate: RowLayout {
-                required property string displayName
-                required property string label
-                required property int brightness
-                required property int maxBrightness
+        delegate: RowLayout {
+            id: displayRow
 
+            required property var model
+            required property int index
+
+            readonly property int percent: model.maxBrightness
+                ? Math.round(100 * model.brightness / model.maxBrightness)
+                : 0
+
+            Layout.fillWidth: true
+            spacing: Kirigami.Units.smallSpacing
+
+            Kirigami.Icon {
+                Layout.preferredWidth: Kirigami.Units.iconSizes.smallMedium
+                Layout.preferredHeight: Layout.preferredWidth
+                source: "video-display-brightness"
+                opacity: 0.8
+            }
+
+            PlasmaComponents3.Slider {
                 Layout.fillWidth: true
-                spacing: Kirigami.Units.smallSpacing
+                from: 0
+                to: model.maxBrightness
+                value: model.brightness
+                stepSize: Math.max(1, model.maxBrightness / 100)
+                enabled: model.maxBrightness > 0
+                onMoved: screenBrightnessControl.setBrightness(model.displayName, value)
+            }
 
-                Kirigami.Icon {
-                    Layout.preferredWidth: Kirigami.Units.iconSizes.smallMedium
-                    Layout.preferredHeight: Layout.preferredWidth
-                    source: "video-display-brightness"
-                }
-
-                PlasmaComponents3.Slider {
-                    id: slider
-
-                    Layout.fillWidth: true
-                    from: 0
-                    to: maxBrightness
-                    value: brightness
-                    stepSize: Math.max(1, maxBrightness / 100)
-                    enabled: maxBrightness > 0
-                    onMoved: screenBrightnessControl.setBrightness(displayName, value)
-                }
-
-                PlasmaComponents3.Label {
-                    Layout.preferredWidth: Kirigami.Units.gridUnit * 2
-                    horizontalAlignment: Text.AlignRight
-                    text: maxBrightness ? Math.round(100 * brightness / maxBrightness) + "%" : ""
-                }
+            PlasmaComponents3.Label {
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 2.5
+                horizontalAlignment: Text.AlignRight
+                text: model.maxBrightness ? displayRow.percent + "%" : ""
             }
         }
+    }
 
-        PlasmaComponents3.Label {
-            Layout.fillWidth: true
-            visible: !screenBrightnessControl.isBrightnessAvailable
-            text: i18n("No brightness control available")
-            opacity: 0.65
-        }
+    PlasmaComponents3.Label {
+        Layout.fillWidth: true
+        visible: !screenBrightnessControl.isBrightnessAvailable
+        text: i18n("No brightness control available")
+        opacity: 0.65
     }
 }

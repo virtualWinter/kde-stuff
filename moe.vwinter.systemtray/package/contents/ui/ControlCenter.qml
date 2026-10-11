@@ -16,9 +16,9 @@ import org.kde.plasma.extras as PlasmaExtras
 import org.kde.plasma.plasmoid
 
 /*
- * A purposefully small quick-settings layout:
- *   Wi-Fi | Bluetooth
- *   Volume and output devices
+ * The Control Center popup:
+ *   Wi-Fi | Bluetooth action tiles
+ *   Sound (volume, mute, output picker)
  *   Brightness
  *   Notifications
  */
@@ -26,16 +26,10 @@ Item {
     id: controlCenter
 
     readonly property string notificationsAppletId: "org.kde.plasma.notifications"
-    readonly property int tileCount: wifiTiles.count + bluetoothTiles.count
-        + volumeTiles.count
 
     implicitWidth: Kirigami.Units.gridUnit * 22
     implicitHeight: Math.max(Kirigami.Units.gridUnit * 12,
-                             heading.height + headerRow.implicitHeight
-                             + connectivityRow.implicitHeight
-                             + volumeTilesBox.implicitHeight
-                             + brightnessControl.implicitHeight
-                             + notifications.implicitHeight)
+                             content.implicitHeight + heading.height)
     Layout.minimumWidth: implicitWidth
     Layout.minimumHeight: implicitHeight
 
@@ -69,15 +63,6 @@ Item {
         Component.onCompleted: sourceModel = Plasmoid.systemTrayModel
     }
 
-    KItemModels.KSortFilterProxyModel {
-        id: volumeModel
-        filterRoleName: "itemId"
-        filterRowCallback: (sourceRow, sourceParent) => controlCenter.isVisibleSystemApplet(
-            sourceModel, sourceRow, sourceParent, "org.kde.plasma.volume")
-        Component.onCompleted: sourceModel = Plasmoid.systemTrayModel
-    }
-
-
     PlasmaExtras.PlasmoidHeading {
         id: heading
 
@@ -90,6 +75,8 @@ Item {
     }
 
     ColumnLayout {
+        id: content
+
         anchors {
             left: parent.left
             right: parent.right
@@ -103,8 +90,10 @@ Item {
             id: headerRow
 
             Layout.fillWidth: true
+            Layout.fillHeight: false
             Layout.leftMargin: Kirigami.Units.smallSpacing
             Layout.rightMargin: Kirigami.Units.smallSpacing
+            Layout.topMargin: Kirigami.Units.smallSpacing
             spacing: Kirigami.Units.smallSpacing
 
             PlasmaExtras.Heading {
@@ -117,7 +106,9 @@ Item {
 
             PlasmaComponents3.ToolButton {
                 id: configureButton
+
                 readonly property var configureAction: Plasmoid.internalAction("configure")
+
                 icon.name: "configure"
                 visible: !!configureAction
                 enabled: !!configureAction && configureAction.enabled
@@ -125,11 +116,14 @@ Item {
                 text: configureAction ? configureAction.text : i18n("Configure System Tray")
                 onClicked: configureButton.configureAction?.trigger()
 
-                PlasmaComponents3.ToolTip { text: configureButton.text }
+                PlasmaComponents3.ToolTip {
+                    text: configureButton.text
+                }
             }
 
             PlasmaComponents3.ToolButton {
                 id: pinButton
+
                 icon.name: "window-pin"
                 checkable: true
                 checked: Plasmoid.configuration.pin
@@ -137,7 +131,9 @@ Item {
                 text: i18n("Keep Open")
                 onToggled: Plasmoid.configuration.pin = checked
 
-                PlasmaComponents3.ToolTip { text: pinButton.text }
+                PlasmaComponents3.ToolTip {
+                    text: pinButton.text
+                }
             }
         }
 
@@ -145,13 +141,16 @@ Item {
             id: connectivityRow
 
             Layout.fillWidth: true
+            Layout.fillHeight: false
             Layout.leftMargin: Kirigami.Units.smallSpacing
             Layout.rightMargin: Kirigami.Units.smallSpacing
             spacing: Kirigami.Units.smallSpacing
 
             Repeater {
                 id: wifiTiles
+
                 model: wifiModel
+
                 delegate: ControlTile {
                     Layout.fillWidth: true
                     Layout.preferredWidth: 0
@@ -161,7 +160,9 @@ Item {
 
             Repeater {
                 id: bluetoothTiles
+
                 model: bluetoothModel
+
                 delegate: ControlTile {
                     Layout.fillWidth: true
                     Layout.preferredWidth: 0
@@ -170,29 +171,12 @@ Item {
             }
         }
 
-        Item {
-            id: volumeTilesBox
-            Layout.fillWidth: true
+        AudioQuickControl {
             Layout.leftMargin: Kirigami.Units.smallSpacing
             Layout.rightMargin: Kirigami.Units.smallSpacing
-            implicitHeight: volumeTiles.count > 0 && volumeTiles.itemAt(0)
-                ? volumeTiles.itemAt(0).implicitHeight
-                : 0
-
-            Repeater {
-                id: volumeTiles
-                model: volumeModel
-                delegate: InlineAppletCard {
-                    anchors.left: parent ? parent.left : undefined
-                    anchors.right: parent ? parent.right : undefined
-                    titleOverride: i18n("Volume & Output")
-                    controlHeight: Kirigami.Units.gridUnit * 13
-                }
-            }
         }
 
         BrightnessQuickControl {
-            id: brightnessControl
             Layout.leftMargin: Kirigami.Units.smallSpacing
             Layout.rightMargin: Kirigami.Units.smallSpacing
         }
@@ -203,8 +187,10 @@ Item {
 
         NotificationsSection {
             id: notifications
+
             Layout.fillWidth: true
-            Layout.preferredHeight: implicitHeight
+            Layout.fillHeight: true
+            Layout.minimumHeight: implicitHeight
         }
     }
 

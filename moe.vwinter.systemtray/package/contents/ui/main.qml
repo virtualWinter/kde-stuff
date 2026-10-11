@@ -32,7 +32,6 @@ ContainmentItem {
     readonly property alias systemTrayState: systemTrayState
     readonly property alias itemSize: tasksGrid.itemSize
     readonly property alias visibleLayout: tasksGrid
-    readonly property alias hiddenItemCount: controlCenter.tileCount
     readonly property bool oneRowOrColumn: tasksGrid.rowsOrColumns === 1
 
     Connections {
