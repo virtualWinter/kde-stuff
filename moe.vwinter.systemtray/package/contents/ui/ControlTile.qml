@@ -12,9 +12,9 @@ import org.kde.kirigami as Kirigami
 import org.kde.plasma.components as PlasmaComponents3
 
 /*
- * A compact action tile. Tapping it opens the stock applet's own popup, which
- * is the only reliable way to drive complex applets such as the network and
- * bluetooth ones. The model roles are read through a plain root object: the
+ * An expandable quick-setting tile. The stock applet owns network scanning,
+ * passwords, pairing and connection actions, so the expanded action opens its
+ * own selector. The model roles are read through a plain root object: the
  * delegate model only initializes required properties declared there.
  */
 Item {
@@ -25,7 +25,10 @@ Item {
 
     signal activated()
 
+    property bool expanded: false
+
     readonly property Item applet: model.hasApplet ? model.applet : null
+    readonly property string itemId: model.itemId ?? ""
     readonly property string title: applet && applet.Plasmoid && applet.Plasmoid.title
         ? applet.Plasmoid.title
         : (model.displayText ?? "")
@@ -38,20 +41,11 @@ Item {
 
     Layout.fillWidth: true
     implicitHeight: Math.max(Kirigami.Units.gridUnit * 4,
-                             rowContent.implicitHeight + Kirigami.Units.smallSpacing * 4)
+                             content.implicitHeight + Kirigami.Units.smallSpacing * 4)
 
     HoverHandler {
         id: tileHover
         cursorShape: Qt.PointingHandCursor
-    }
-
-    TapHandler {
-        onTapped: {
-            if (tile.applet && tile.applet.Plasmoid) {
-                tile.applet.Plasmoid.activated();
-                tile.activated();
-            }
-        }
     }
 
     QuickSettingCard {
@@ -61,38 +55,70 @@ Item {
         color: Qt.alpha(Kirigami.Theme.textColor, tileHover.hovered ? 0.12 : 0.06)
     }
 
-    RowLayout {
-        id: rowContent
+    ColumnLayout {
+        id: content
 
         anchors.fill: card
         anchors.margins: Kirigami.Units.smallSpacing * 2
         spacing: Kirigami.Units.smallSpacing
 
-        Kirigami.Icon {
-            Layout.preferredWidth: Kirigami.Units.iconSizes.medium
-            Layout.preferredHeight: Layout.preferredWidth
-            source: tile.model.iconName ?? ""
-        }
+        RowLayout {
+            id: rowContent
 
-        ColumnLayout {
             Layout.fillWidth: true
-            spacing: 0
 
-            PlasmaComponents3.Label {
-                Layout.fillWidth: true
-                text: tile.title
-                elide: Text.ElideRight
-                maximumLineCount: 1
-                font.weight: Font.DemiBold
+            TapHandler {
+                onTapped: tile.expanded = !tile.expanded
             }
 
-            PlasmaComponents3.Label {
+            Kirigami.Icon {
+                Layout.preferredWidth: Kirigami.Units.iconSizes.medium
+                Layout.preferredHeight: Layout.preferredWidth
+                source: tile.model.iconName ?? ""
+            }
+
+            ColumnLayout {
                 Layout.fillWidth: true
-                visible: text !== ""
-                text: tile.subtitle
-                elide: Text.ElideRight
-                maximumLineCount: 1
+                spacing: 0
+
+                PlasmaComponents3.Label {
+                    Layout.fillWidth: true
+                    text: tile.title
+                    elide: Text.ElideRight
+                    maximumLineCount: 1
+                    font.weight: Font.DemiBold
+                }
+
+                PlasmaComponents3.Label {
+                    Layout.fillWidth: true
+                    visible: text !== ""
+                    text: tile.subtitle
+                    elide: Text.ElideRight
+                    maximumLineCount: 1
+                    opacity: 0.65
+                }
+            }
+
+            Kirigami.Icon {
+                Layout.preferredWidth: Kirigami.Units.iconSizes.small
+                Layout.preferredHeight: Layout.preferredWidth
+                source: tile.expanded ? "go-up" : "go-down"
                 opacity: 0.65
+            }
+        }
+
+        PlasmaComponents3.Button {
+            Layout.fillWidth: true
+            visible: tile.expanded
+            text: tile.itemId === "org.kde.plasma.networkmanagement"
+                ? i18n("Choose a network…")
+                : i18n("Choose a device…")
+            icon.name: "go-next"
+            onClicked: {
+                if (tile.applet?.Plasmoid) {
+                    tile.applet.Plasmoid.activated();
+                    tile.activated();
+                }
             }
         }
     }
