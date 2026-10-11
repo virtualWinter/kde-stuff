@@ -33,7 +33,9 @@ Item {
                              + quickSettingsGrid.implicitHeight
                              + notifications.implicitHeight)
     Layout.minimumWidth: implicitWidth
-    Layout.minimumHeight: Kirigami.Units.gridUnit * 16
+    // AppletPopup remembers its previous size. Keep that saved size from
+    // clipping the complete no-scroll grid or its notification footer.
+    Layout.minimumHeight: implicitHeight
 
     focus: true
 
@@ -131,15 +133,13 @@ Item {
             }
         }
 
-        GridLayout {
+        Flow {
             id: quickSettingsGrid
 
             Layout.fillWidth: true
             Layout.leftMargin: Kirigami.Units.smallSpacing
             Layout.rightMargin: Kirigami.Units.smallSpacing
-            columns: 2
-            columnSpacing: Kirigami.Units.smallSpacing
-            rowSpacing: Kirigami.Units.smallSpacing
+            spacing: Kirigami.Units.smallSpacing
 
             Repeater {
                 id: tiles
@@ -147,6 +147,9 @@ Item {
                 model: quickSettingsModel
 
                 delegate: ControlTile {
+                    // Finish an odd row cleanly instead of leaving a spare
+                    // card-sized hole beside the last setting.
+                    spanFullRow: tiles.count % 2 === 1 && index === tiles.count - 1
                     onActivated: systemTrayState.expanded = false
                 }
             }
