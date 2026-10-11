@@ -22,6 +22,12 @@ GridModule {
 
     property int sizeCode: 2
 
+    /* The stock volume applet, for the parts the module does not show, such as
+     * the per-application streams. */
+    property Item applet: null
+
+    signal popupLaunched()
+
     readonly property var sink: Server.defaultSink
     readonly property bool muted: sink ? sink.muted : false
     readonly property int percent: sink
@@ -41,9 +47,20 @@ GridModule {
     readonly property bool iconOnly: sizeCode === 1
     readonly property bool stacked: sizeCode === 3
 
-    // The icon-sized module has no room for a mute button, so its surface is one.
-    canActivate: sound.iconOnly
-    onActivated: sound.toggleMute()
+    /* The icon-sized module has no room for a mute button, so its surface is
+     * one; wider modules hand the click to the stock volume applet. */
+    canActivate: sound.iconOnly || sound.applet !== null
+
+    onActivated: {
+        if (sound.iconOnly) {
+            sound.toggleMute();
+            return;
+        }
+        if (sound.applet && sound.applet.Plasmoid) {
+            sound.applet.Plasmoid.activated();
+            sound.popupLaunched();
+        }
+    }
 
     function toggleMute() {
         if (sound.sink) {

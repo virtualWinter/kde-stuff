@@ -23,6 +23,19 @@ QuickSettingCard {
 
     property bool outputExpanded: false
 
+    /* The stock volume applet, for the parts this card does not show, such as
+     * the per-application streams. Tapping the header opens it. */
+    property Item applet: null
+
+    signal popupLaunched()
+
+    function openApplet() {
+        if (audio.applet && audio.applet.Plasmoid) {
+            audio.applet.Plasmoid.activated();
+            audio.popupLaunched();
+        }
+    }
+
     readonly property var sink: Server.defaultSink
     readonly property bool muted: sink ? sink.muted : false
     readonly property int percent: sink
@@ -54,8 +67,15 @@ QuickSettingCard {
     }
 
     RowLayout {
+        id: headerRow
+
         Layout.fillWidth: true
         spacing: Kirigami.Units.smallSpacing
+
+        TapHandler {
+            enabled: audio.applet !== null
+            onTapped: audio.openApplet()
+        }
 
         Kirigami.Icon {
             Layout.preferredWidth: Kirigami.Units.iconSizes.medium

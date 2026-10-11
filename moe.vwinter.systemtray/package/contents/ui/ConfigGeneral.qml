@@ -39,6 +39,7 @@ KCMUtils.ScrollViewKCM {
     property list<string> cfg_disabledStatusNotifiers: []
 
     property int cfg_layoutStyle
+    property bool cfg_trayClickOpensControlCenter
     property int cfg_wifiModuleSize
     property int cfg_bluetoothModuleSize
     property int cfg_soundModuleSize
@@ -388,6 +389,13 @@ KCMUtils.ScrollViewKCM {
 
                 currentIndex: Math.max(0, iconsPage.cfg_layoutStyle)
                 onActivated: iconsPage.cfg_layoutStyle = currentValue
+            }
+
+            QQC2.CheckBox {
+                Kirigami.FormData.label: i18nc("@label Whether clicking the quick settings icons in the Panel opens the control center", "Tray icon click:") // qmllint disable unqualified
+                text: i18nc("@option:check Open the control center instead of the applet's own popup", "Open Control Center")
+                checked: iconsPage.cfg_trayClickOpensControlCenter
+                onToggled: iconsPage.cfg_trayClickOpensControlCenter = checked
             }
 
             Kirigami.FormData.label: i18nc("@label Group of settings about the size of the popup modules", "Module size:") // qmllint disable unqualified

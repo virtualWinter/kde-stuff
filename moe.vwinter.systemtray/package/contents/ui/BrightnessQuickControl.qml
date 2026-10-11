@@ -19,14 +19,34 @@ import org.kde.plasma.private.brightnesscontrolplugin
 QuickSettingCard {
     id: brightness
 
+    /* The stock brightness applet, for the parts this card does not show.
+     * Tapping the header opens it. */
+    property Item applet: null
+
+    signal popupLaunched()
+
+    function openApplet() {
+        if (brightness.applet && brightness.applet.Plasmoid) {
+            brightness.applet.Plasmoid.activated();
+            brightness.popupLaunched();
+        }
+    }
+
     ScreenBrightnessControl {
         id: screenBrightnessControl
         isSilent: true
     }
 
     RowLayout {
+        id: headerRow
+
         Layout.fillWidth: true
         spacing: Kirigami.Units.smallSpacing
+
+        TapHandler {
+            enabled: brightness.applet !== null
+            onTapped: brightness.openApplet()
+        }
 
         Kirigami.Icon {
             Layout.preferredWidth: Kirigami.Units.iconSizes.medium

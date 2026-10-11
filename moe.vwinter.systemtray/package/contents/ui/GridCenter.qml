@@ -69,6 +69,10 @@ Item {
     property string notificationsTitle: ""
     property string notificationsSubtitle: ""
 
+    // The stock applets behind the sound and brightness modules.
+    property Item volumeApplet: null
+    property Item brightnessApplet: null
+
     readonly property real cellSize: Math.max(Kirigami.Units.gridUnit * 3,
                                               (width - (columns - 1) * gap) / columns)
     readonly property real gridWidth: columns * cellSize + (columns - 1) * gap
@@ -278,6 +282,58 @@ Item {
         }
     }
 
+    KItemModels.KSortFilterProxyModel {
+        id: volumeModel
+
+        filterRoleName: "itemId"
+        filterRowCallback: (sourceRow, sourceParent) => grid.isVisibleSystemApplet(
+            sourceModel, sourceRow, sourceParent, "org.kde.plasma.volume")
+        Component.onCompleted: sourceModel = Plasmoid.systemTrayModel
+    }
+
+    Instantiator {
+        model: volumeModel
+
+        delegate: QtObject {
+            required property QtObject applet
+            required property bool hasApplet
+
+            function sync() {
+                grid.volumeApplet = hasApplet && applet ? applet : null;
+            }
+
+            Component.onCompleted: sync()
+            onAppletChanged: sync()
+            onHasAppletChanged: sync()
+        }
+    }
+
+    KItemModels.KSortFilterProxyModel {
+        id: brightnessModel
+
+        filterRoleName: "itemId"
+        filterRowCallback: (sourceRow, sourceParent) => grid.isVisibleSystemApplet(
+            sourceModel, sourceRow, sourceParent, "org.kde.plasma.brightness")
+        Component.onCompleted: sourceModel = Plasmoid.systemTrayModel
+    }
+
+    Instantiator {
+        model: brightnessModel
+
+        delegate: QtObject {
+            required property QtObject applet
+            required property bool hasApplet
+
+            function sync() {
+                grid.brightnessApplet = hasApplet && applet ? applet : null;
+            }
+
+            Component.onCompleted: sync()
+            onAppletChanged: sync()
+            onHasAppletChanged: sync()
+        }
+    }
+
     AppletModule {
         applet: grid.wifiApplet
         iconName: grid.wifiIcon
@@ -329,21 +385,27 @@ Item {
     }
 
     SoundModule {
+        applet: grid.volumeApplet
         sizeCode: grid.sizeOf("sound")
 
         x: grid.boxFor("sound").x
         y: grid.boxFor("sound").y
         width: grid.boxFor("sound").width
         height: grid.boxFor("sound").height
+
+        onPopupLaunched: grid.appletPopupLaunched()
     }
 
     BrightnessModule {
+        applet: grid.brightnessApplet
         sizeCode: grid.sizeOf("brightness")
 
         x: grid.boxFor("brightness").x
         y: grid.boxFor("brightness").y
         width: grid.boxFor("brightness").width
         height: grid.boxFor("brightness").height
+
+        onPopupLaunched: grid.appletPopupLaunched()
     }
 
     AppletModule {

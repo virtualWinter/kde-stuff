@@ -27,18 +27,83 @@ AbstractItem {
     textFormat: applet?.toolTipTextFormat ?? 0 /* Text.AutoText, the default value */
     active: inVisibleLayout || (systemTrayState.activeApplet !== applet && (text != mainText || subText.length > 0))
 
+    /*
+     * The tray applets the control center has a module for. They are sorted to
+     * the front of the tray by the tray model, so that they form one group,
+     * and each of them draws its piece of the underline of that group.
+     */
+    readonly property bool onControlCenterGroup: inVisibleLayout && [
+        "org.kde.plasma.networkmanagement",
+        "org.kde.plasma.bluetooth",
+        "org.kde.plasma.volume",
+        "org.kde.plasma.brightness",
+        "org.kde.plasma.notifications"
+    ].includes(itemId)
+
+    /*
+     * Those same icons open the control center instead of the applet's popup.
+     * The applets it does not cover (clipboard, weather, battery and friends)
+     * keep theirs, and items sitting in the hidden area keep theirs as well,
+     * since the control center cannot replace an applet that is not
+     * represented in it.
+     */
+    readonly property bool opensControlCenter: onControlCenterGroup
+        && Plasmoid.configuration.trayClickOpensControlCenter
+
+    /*
+     * One continuous bar under the whole group: every icon of the group spans
+     * its entire cell with the bar, so neighbouring bars join, and the bar
+     * lights up while the control center is open.
+     */
+    Rectangle {
+        id: controlCenterBar
+
+        readonly property int thickness: Math.max(2, Math.round(Kirigami.Units.gridUnit / 6))
+
+        visible: opacity > 0
+        opacity: plasmoidContainer.onControlCenterGroup ? 1 : 0
+
+        color: systemTrayState.expanded
+            ? Kirigami.Theme.highlightColor
+            : Qt.alpha(Kirigami.Theme.highlightColor, 0.4)
+        radius: thickness / 2
+
+        // A vertical panel underlines on the side the icons emerge from.
+        x: root.vertical ? parent.width - thickness : 0
+        y: root.vertical ? 0 : parent.height - thickness
+        width: root.vertical ? thickness : parent.width
+        height: root.vertical ? parent.height : thickness
+
+        Behavior on opacity {
+            NumberAnimation {
+                duration: Kirigami.Units.shortDuration
+            }
+        }
+        Behavior on color {
+            ColorAnimation {
+                duration: Kirigami.Units.shortDuration
+            }
+        }
+    }
+
     // FIXME: Use an input type agnostic way to activate whatever the primary
     // action of a plasmoid is supposed to be, even if it's just expanding the
     // Plasmoid. Not all plasmoids are supposed to expand and not all plasmoids
     // do anything with onActivated.
     onActivated: pos => {
-        if (applet) {
+        if (plasmoidContainer.opensControlCenter) {
+            systemTrayState.expanded = !systemTrayState.expanded;
+        } else if (applet) {
             applet.Plasmoid.activated()
         }
     }
 
     onClicked: mouse => {
         if (!applet) {
+            return
+        }
+        if (mouse.button === Qt.LeftButton && plasmoidContainer.opensControlCenter) {
+            systemTrayState.expanded = !systemTrayState.expanded;
             return
         }
         //forward click event to the applet
@@ -56,6 +121,9 @@ AbstractItem {
         // SNI has few problems, for example legacy applications that still use XEmbed require mouse to be released.
         if (mouse.button === Qt.RightButton) {
             contextMenu(mouse);
+        } else if (mouse.button === Qt.LeftButton && plasmoidContainer.opensControlCenter) {
+            // The control center takes this click, so there is no applet
+            // interaction to forward the press to.
         } else {
             const appletItem = applet.compactRepresentationItem ?? applet.fullRepresentationItem
             const mouseArea = findMouseArea(appletItem)

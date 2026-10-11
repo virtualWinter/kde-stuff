@@ -49,6 +49,10 @@
       <label>Layout of the popup: 0 is the compact stacked list, 1 is the module grid</label>
       <default>0</default>
     </entry>
+    <entry name="trayClickOpensControlCenter" type="Bool">
+      <label>Whether clicking the tray icons of the quick settings opens the control center instead of their own popup</label>
+      <default>true</default>
+    </entry>
     <entry name="wifiModuleSize" type="Int">
       <label>Grid size of the Wi-Fi module: 0 auto, 1 small, 2 wide, 3 large, 4 full width</label>
       <default>0</default>

@@ -18,6 +18,17 @@ static const QList<QString> s_categoryOrder = {
     QStringLiteral("Hardware"),
 };
 
+// The system tray applets the control center has a module for. They are kept
+// together at the front of the tray, in this order, so that they form one
+// group on the panel instead of being scattered among the other icons.
+static const QList<QString> s_controlCenterOrder = {
+    QStringLiteral("org.kde.plasma.networkmanagement"),
+    QStringLiteral("org.kde.plasma.bluetooth"),
+    QStringLiteral("org.kde.plasma.volume"),
+    QStringLiteral("org.kde.plasma.brightness"),
+    QStringLiteral("org.kde.plasma.notifications"),
+};
+
 SortedSystemTrayModel::SortedSystemTrayModel(SortingType sorting, QObject *parent)
     : QSortFilterProxyModel(parent)
     , m_sorting(sorting)
@@ -52,6 +63,20 @@ bool SortedSystemTrayModel::lessThanSystemTray(const QModelIndex &left, const QM
 {
     QVariant itemIdLeft = left.data(static_cast<int>(BaseModel::BaseRole::ItemId));
     QVariant itemIdRight = right.data(static_cast<int>(BaseModel::BaseRole::ItemId));
+
+    // The control center group is put in front of everything else, and sorted
+    // among itself by the order the icons are listed in above.
+    const int groupLeft = s_controlCenterOrder.indexOf(itemIdLeft.toString());
+    const int groupRight = s_controlCenterOrder.indexOf(itemIdRight.toString());
+    if (groupLeft != -1 || groupRight != -1) {
+        if (groupLeft == -1) {
+            return false;
+        } else if (groupRight == -1) {
+            return true;
+        }
+        return groupLeft < groupRight;
+    }
+
     if (itemIdRight.toString() == QLatin1String("org.kde.plasma.notifications")) {
         // return false when at least right is "org.kde.plasma.notifications"
         return false;

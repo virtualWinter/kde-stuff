@@ -22,10 +22,22 @@ GridModule {
 
     property int sizeCode: 2
 
+    /* The stock brightness applet, for the parts the module does not show. */
+    property Item applet: null
+
+    signal popupLaunched()
+
     readonly property bool iconOnly: sizeCode === 1
     readonly property bool stacked: sizeCode === 3
 
-    canActivate: false
+    canActivate: brightness.applet !== null
+
+    onActivated: {
+        if (brightness.applet && brightness.applet.Plasmoid) {
+            brightness.applet.Plasmoid.activated();
+            brightness.popupLaunched();
+        }
+    }
 
     ScreenBrightnessControl {
         id: screenBrightnessControl
