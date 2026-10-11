@@ -251,13 +251,17 @@ ContainmentItem {
             visible: systemTrayState.expanded
             appletInterface: root
 
-            // The control center draws no theme background: the dialog is told
-            // to skip it, and the window itself is painted in the tone of the
-            // panel. The dialog keeps laying the main item out inside the
-            // frame margins, so painting the window is what keeps that strip
-            // from showing the window's default colour.
+            // The control center draws its own surface instead of the theme's
+            // dialog background.
             backgroundHints: PlasmaCore.Types.NoBackground
-            color: Kirigami.Theme.backgroundColor
+
+            // Paint the full dialog surface, including the frame margins
+            // around mainItem. Keep it behind the content item.
+            Rectangle {
+                anchors.fill: parent
+                z: -1
+                color: Kirigami.Theme.backgroundColor
+            }
 
             onVisibleChanged: {
                 if (!visible) {
@@ -273,9 +277,9 @@ ContainmentItem {
                 // Draws a line between the applet dialog and the panel
                 KSvg.SvgItem {
                     id: separator
-                    // Only draw for popups of panel applets, not desktop applets
-                    visible: [PlasmaCore.Types.TopEdge, PlasmaCore.Types.LeftEdge, PlasmaCore.Types.RightEdge, PlasmaCore.Types.BottomEdge]
-                        .includes(Plasmoid.location) && !dialog.margin
+                    // The control-center surface meets the panel directly;
+                    // don't draw the stock separator line across its edge.
+                    visible: false
                     anchors {
                         left: parent.left
                         right: parent.right

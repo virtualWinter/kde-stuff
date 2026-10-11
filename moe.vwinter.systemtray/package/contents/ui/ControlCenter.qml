@@ -64,20 +64,6 @@ Item {
         Component.onCompleted: sourceModel = Plasmoid.systemTrayModel
     }
 
-    /*
-     * One surface for the whole popup, behind both the heading and the
-     * content. The popup window has no theme background of its own
-     * (NoBackground), so without this the window shows through and the
-     * heading's own themed background would sit in a different tone above
-     * the cards.
-     */
-    Rectangle {
-        id: background
-
-        anchors.fill: parent
-        color: Kirigami.Theme.backgroundColor
-    }
-
     PlasmaExtras.PlasmoidHeading {
         id: heading
 
@@ -88,8 +74,8 @@ Item {
         }
         height: headerRow.height + bottomPadding
 
-        // The surface above draws the popup's tone; the heading's themed
-        // background would only reintroduce a second tone.
+        // The popup window surface already provides the background; the
+        // heading's themed background would reintroduce a second tone.
         background.visible: false
     }
 
@@ -103,17 +89,17 @@ Item {
             bottom: parent.bottom
             topMargin: heading.height
         }
-        spacing: Kirigami.Units.smallSpacing
+        spacing: Kirigami.Units.smallSpacing / 2
 
         RowLayout {
             id: headerRow
 
             Layout.fillWidth: true
             Layout.fillHeight: false
-            Layout.leftMargin: Kirigami.Units.smallSpacing
-            Layout.rightMargin: Kirigami.Units.smallSpacing
-            Layout.topMargin: Kirigami.Units.smallSpacing
-            spacing: Kirigami.Units.smallSpacing
+            Layout.leftMargin: Kirigami.Units.smallSpacing / 2
+            Layout.rightMargin: Kirigami.Units.smallSpacing / 2
+            Layout.topMargin: Kirigami.Units.smallSpacing / 2
+            spacing: Kirigami.Units.smallSpacing / 2
 
             PlasmaExtras.Heading {
                 Layout.fillWidth: true
@@ -161,10 +147,10 @@ Item {
 
             Layout.fillWidth: true
             Layout.fillHeight: false
-            Layout.leftMargin: Kirigami.Units.smallSpacing
-            Layout.rightMargin: Kirigami.Units.smallSpacing
+            Layout.leftMargin: Kirigami.Units.smallSpacing / 2
+            Layout.rightMargin: Kirigami.Units.smallSpacing / 2
             visible: !controlCenter.gridMode
-            spacing: Kirigami.Units.smallSpacing
+            spacing: Kirigami.Units.smallSpacing / 2
 
             Repeater {
                 id: wifiTiles
@@ -192,14 +178,14 @@ Item {
         }
 
         AudioQuickControl {
-            Layout.leftMargin: Kirigami.Units.smallSpacing
-            Layout.rightMargin: Kirigami.Units.smallSpacing
+            Layout.leftMargin: Kirigami.Units.smallSpacing / 2
+            Layout.rightMargin: Kirigami.Units.smallSpacing / 2
             visible: !controlCenter.gridMode
         }
 
         BrightnessQuickControl {
-            Layout.leftMargin: Kirigami.Units.smallSpacing
-            Layout.rightMargin: Kirigami.Units.smallSpacing
+            Layout.leftMargin: Kirigami.Units.smallSpacing / 2
+            Layout.rightMargin: Kirigami.Units.smallSpacing / 2
             visible: !controlCenter.gridMode
         }
 
@@ -222,9 +208,9 @@ Item {
 
             Layout.fillWidth: true
             Layout.fillHeight: true
-            Layout.leftMargin: Kirigami.Units.smallSpacing
-            Layout.rightMargin: Kirigami.Units.smallSpacing
-            Layout.topMargin: Kirigami.Units.smallSpacing
+            Layout.leftMargin: Kirigami.Units.smallSpacing / 2
+            Layout.rightMargin: Kirigami.Units.smallSpacing / 2
+            Layout.topMargin: Kirigami.Units.smallSpacing / 2
             visible: controlCenter.gridMode
 
             onAppletPopupLaunched: systemTrayState.expanded = false
