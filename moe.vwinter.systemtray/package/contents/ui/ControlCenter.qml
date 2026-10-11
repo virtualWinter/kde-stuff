@@ -65,6 +65,14 @@ Item {
         Component.onCompleted: sourceModel = Plasmoid.systemTrayModel
     }
 
+    KItemModels.KSortFilterProxyModel {
+        id: batteryModel
+        filterRoleName: "itemId"
+        filterRowCallback: (sourceRow, sourceParent) => controlCenter.isVisibleSystemApplet(
+            sourceModel, sourceRow, sourceParent, "org.kde.plasma.battery")
+        Component.onCompleted: sourceModel = Plasmoid.systemTrayModel
+    }
+
     ColumnLayout {
         id: content
 
@@ -172,6 +180,15 @@ Item {
             Layout.leftMargin: Kirigami.Units.smallSpacing / 2
             Layout.rightMargin: Kirigami.Units.smallSpacing / 2
             visible: !controlCenter.gridMode
+        }
+
+        Repeater {
+            model: controlCenter.gridMode ? 0 : batteryModel
+
+            delegate: BatteryStatusCard {
+                Layout.leftMargin: Kirigami.Units.smallSpacing / 2
+                Layout.rightMargin: Kirigami.Units.smallSpacing / 2
+            }
         }
 
         Kirigami.Separator {

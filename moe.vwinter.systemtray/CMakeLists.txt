@@ -100,6 +100,7 @@ plasma_add_applet(moe.vwinter.systemtray
         package/contents/ui/AppletModule.qml
         package/contents/ui/AudioQuickControl.qml
         package/contents/ui/BackgroundAppItem.qml
+        package/contents/ui/BatteryStatusCard.qml
         package/contents/ui/BrightnessModule.qml
         package/contents/ui/ConfigGeneral.qml
         package/contents/ui/ControlCenter.qml
