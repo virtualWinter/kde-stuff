@@ -26,7 +26,12 @@ Item {
     readonly property int tileCount: tiles.count
 
     implicitWidth: Kirigami.Units.gridUnit * 22
-    implicitHeight: Kirigami.Units.gridUnit * 28
+    // Keep the popup only as tall as its header, full settings grid, and
+    // notification section. The settings themselves never need a scrollbar.
+    implicitHeight: Math.max(Kirigami.Units.gridUnit * 12,
+                             heading.height + headerRow.implicitHeight
+                             + quickSettingsGrid.implicitHeight
+                             + notifications.implicitHeight)
     Layout.minimumWidth: implicitWidth
     Layout.minimumHeight: Kirigami.Units.gridUnit * 16
 
@@ -79,10 +84,10 @@ Item {
             id: headerRow
 
             Layout.fillWidth: true
-            Layout.leftMargin: Kirigami.Units.largeSpacing
+            Layout.leftMargin: Kirigami.Units.smallSpacing
             Layout.rightMargin: Kirigami.Units.smallSpacing
-            Layout.topMargin: Kirigami.Units.smallSpacing
-            Layout.bottomMargin: Kirigami.Units.smallSpacing
+            Layout.topMargin: 0
+            Layout.bottomMargin: 0
             spacing: Kirigami.Units.smallSpacing
 
             PlasmaExtras.Heading {
@@ -126,29 +131,23 @@ Item {
             }
         }
 
-        PlasmaComponents3.ScrollView {
-            id: tilesScroll
+        GridLayout {
+            id: quickSettingsGrid
 
             Layout.fillWidth: true
-            Layout.fillHeight: true
-            Layout.minimumHeight: Kirigami.Units.gridUnit * 8
             Layout.leftMargin: Kirigami.Units.smallSpacing
             Layout.rightMargin: Kirigami.Units.smallSpacing
+            columns: 2
+            columnSpacing: Kirigami.Units.smallSpacing
+            rowSpacing: Kirigami.Units.smallSpacing
 
-            GridLayout {
-                width: tilesScroll.availableWidth
-                columns: 2
-                columnSpacing: Kirigami.Units.smallSpacing
-                rowSpacing: Kirigami.Units.smallSpacing
+            Repeater {
+                id: tiles
 
-                Repeater {
-                    id: tiles
+                model: quickSettingsModel
 
-                    model: quickSettingsModel
-
-                    delegate: ControlTile {
-                        onActivated: systemTrayState.expanded = false
-                    }
+                delegate: ControlTile {
+                    onActivated: systemTrayState.expanded = false
                 }
             }
         }

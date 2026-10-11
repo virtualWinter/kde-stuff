@@ -51,8 +51,8 @@ Rectangle {
 
     RowLayout {
         anchors.fill: parent
-        anchors.margins: Kirigami.Units.largeSpacing
-        spacing: Kirigami.Units.largeSpacing
+        anchors.margins: Kirigami.Units.smallSpacing
+        spacing: Kirigami.Units.smallSpacing
 
         Kirigami.Icon {
             Layout.preferredWidth: Kirigami.Units.iconSizes.medium

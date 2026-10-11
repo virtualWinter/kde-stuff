@@ -69,8 +69,8 @@ Item {
             top: parent.top
             left: parent.left
             right: parent.right
-            leftMargin: Kirigami.Units.largeSpacing
-            rightMargin: Kirigami.Units.largeSpacing
+            leftMargin: Kirigami.Units.smallSpacing
+            rightMargin: Kirigami.Units.smallSpacing
         }
         level: 4
         text: i18n("Notifications")
