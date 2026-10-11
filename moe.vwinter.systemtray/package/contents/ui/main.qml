@@ -228,17 +228,9 @@ ContainmentItem {
                 default:
                     return Qt.TopEdge
             }
-            margin: (Plasmoid.containmentDisplayHints & PlasmaCore.Types.ContainmentPrefersFloatingApplets) ? Kirigami.Units.largeSpacing : 0
-
-            Behavior on margin {
-                NumberAnimation {
-                    // Since the panel animation won't be perfectly in sync,
-                    // using a duration larger than the panel animation results
-                    // in a better-looking animation.
-                    duration: Kirigami.Units.veryLongDuration
-                    easing.type: Easing.OutCubic
-                }
-            }
+            // Keep the popup flush with its panel instead of leaving the
+            // floating-applet gap between the panel and the control center.
+            margin: 0
 
             floating: Plasmoid.location == PlasmaCore.Desktop
 
