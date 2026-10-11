@@ -55,8 +55,8 @@ AbstractItem {
 
     /*
      * One continuous bar under the whole group: every icon of the group spans
-     * its entire cell with the bar, so neighbouring bars join, and the bar
-     * lights up while the control center is open.
+     * its entire cell with the bar, so neighbouring bars join. It is only drawn
+     * while the control center is open, so the group is unmarked at rest.
      */
     Rectangle {
         id: controlCenterBar
@@ -64,7 +64,7 @@ AbstractItem {
         readonly property int thickness: Math.max(2, Math.round(Kirigami.Units.gridUnit / 6))
 
         visible: opacity > 0
-        opacity: plasmoidContainer.onControlCenterGroup ? 1 : 0
+        opacity: plasmoidContainer.onControlCenterGroup && systemTrayState.expanded ? 1 : 0
 
         color: systemTrayState.expanded
             ? Kirigami.Theme.highlightColor

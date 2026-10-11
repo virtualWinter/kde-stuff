@@ -19,8 +19,9 @@ static const QList<QString> s_categoryOrder = {
 };
 
 // The system tray applets the control center has a module for. They are kept
-// together at the front of the tray, in this order, so that they form one
-// group on the panel instead of being scattered among the other icons.
+// together at the end of the tray, in this order, so that they form one group
+// on the panel instead of being scattered among the other icons, and the
+// regular app applets sit to their left.
 static const QList<QString> s_controlCenterOrder = {
     QStringLiteral("org.kde.plasma.networkmanagement"),
     QStringLiteral("org.kde.plasma.bluetooth"),
@@ -64,15 +65,16 @@ bool SortedSystemTrayModel::lessThanSystemTray(const QModelIndex &left, const QM
     QVariant itemIdLeft = left.data(static_cast<int>(BaseModel::BaseRole::ItemId));
     QVariant itemIdRight = right.data(static_cast<int>(BaseModel::BaseRole::ItemId));
 
-    // The control center group is put in front of everything else, and sorted
-    // among itself by the order the icons are listed in above.
+    // The control center group is kept at the end of the tray, after all the
+    // regular applets, and sorted among itself by the order listed above. A
+    // group icon sorts after a non-group icon, so the group is pushed right.
     const int groupLeft = s_controlCenterOrder.indexOf(itemIdLeft.toString());
     const int groupRight = s_controlCenterOrder.indexOf(itemIdRight.toString());
     if (groupLeft != -1 || groupRight != -1) {
         if (groupLeft == -1) {
-            return false;
-        } else if (groupRight == -1) {
             return true;
+        } else if (groupRight == -1) {
+            return false;
         }
         return groupLeft < groupRight;
     }
