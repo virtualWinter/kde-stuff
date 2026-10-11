@@ -16,50 +16,67 @@ import org.kde.plasma.extras as PlasmaExtras
 import org.kde.plasma.plasmoid
 
 /*
- * Control Center: the tray's quick settings as a grid of cards, with the
- * notification list docked underneath.
+ * A purposefully small quick-settings layout:
+ *   Wi-Fi | Bluetooth
+ *   Volume and output devices
+ *   Brightness
+ *   Notifications
  */
 Item {
     id: controlCenter
 
     readonly property string notificationsAppletId: "org.kde.plasma.notifications"
-    readonly property int tileCount: tiles.count
+    readonly property int tileCount: wifiTiles.count + bluetoothTiles.count
+        + volumeTiles.count
 
     implicitWidth: Kirigami.Units.gridUnit * 22
-    // Keep the popup only as tall as its header, full settings grid, and
-    // notification section. The settings themselves never need a scrollbar.
     implicitHeight: Math.max(Kirigami.Units.gridUnit * 12,
                              heading.height + headerRow.implicitHeight
-                             + quickSettingsGrid.implicitHeight
+                             + connectivityRow.implicitHeight
+                             + volumeTilesBox.implicitHeight
+                             + brightnessControl.implicitHeight
                              + notifications.implicitHeight)
     Layout.minimumWidth: implicitWidth
-    // AppletPopup remembers its previous size. Keep that saved size from
-    // clipping the complete no-scroll grid or its notification footer.
     Layout.minimumHeight: implicitHeight
 
     focus: true
 
     // Role numbers from BaseModel::BaseRole in src/systemtraymodel.h:
     // ItemType = Qt::UserRole + 1, ItemId = +2, EffectiveStatus = +6.
-    // Only applets that are part of this tray (not unloaded plugins, not
-    // status-notifier apps) and that are shown in the panel or popup count.
+    function isVisibleSystemApplet(sourceModel, sourceRow, sourceParent, itemId) {
+        const row = sourceModel.index(sourceRow, 0, sourceParent);
+        const itemType = sourceModel.data(row, Qt.UserRole + 1);
+        const id = sourceModel.data(row, Qt.UserRole + 2);
+        const status = sourceModel.data(row, Qt.UserRole + 6);
+
+        return itemType === "Plasmoid" && id === itemId
+            && (status === PlasmaCore.Types.ActiveStatus || status === PlasmaCore.Types.PassiveStatus);
+    }
+
     KItemModels.KSortFilterProxyModel {
-        id: quickSettingsModel
-
-        filterRoleName: "effectiveStatus"
-        filterRowCallback: (sourceRow, sourceParent) => {
-            const row = sourceModel.index(sourceRow, 0, sourceParent);
-            const itemType = sourceModel.data(row, Qt.UserRole + 1);
-            const itemId = sourceModel.data(row, Qt.UserRole + 2);
-            const status = sourceModel.data(row, Qt.UserRole + 6);
-
-            return itemType === "Plasmoid"
-                && itemId !== controlCenter.notificationsAppletId
-                && (status === PlasmaCore.Types.ActiveStatus || status === PlasmaCore.Types.PassiveStatus);
-        }
-        // avoid unnecessary binding, it causes loops
+        id: wifiModel
+        filterRoleName: "itemId"
+        filterRowCallback: (sourceRow, sourceParent) => controlCenter.isVisibleSystemApplet(
+            sourceModel, sourceRow, sourceParent, "org.kde.plasma.networkmanagement")
         Component.onCompleted: sourceModel = Plasmoid.systemTrayModel
     }
+
+    KItemModels.KSortFilterProxyModel {
+        id: bluetoothModel
+        filterRoleName: "itemId"
+        filterRowCallback: (sourceRow, sourceParent) => controlCenter.isVisibleSystemApplet(
+            sourceModel, sourceRow, sourceParent, "org.kde.plasma.bluetooth")
+        Component.onCompleted: sourceModel = Plasmoid.systemTrayModel
+    }
+
+    KItemModels.KSortFilterProxyModel {
+        id: volumeModel
+        filterRoleName: "itemId"
+        filterRowCallback: (sourceRow, sourceParent) => controlCenter.isVisibleSystemApplet(
+            sourceModel, sourceRow, sourceParent, "org.kde.plasma.volume")
+        Component.onCompleted: sourceModel = Plasmoid.systemTrayModel
+    }
+
 
     PlasmaExtras.PlasmoidHeading {
         id: heading
@@ -80,7 +97,7 @@ Item {
             bottom: parent.bottom
             topMargin: heading.height
         }
-        spacing: 0
+        spacing: Kirigami.Units.smallSpacing
 
         RowLayout {
             id: headerRow
@@ -88,8 +105,6 @@ Item {
             Layout.fillWidth: true
             Layout.leftMargin: Kirigami.Units.smallSpacing
             Layout.rightMargin: Kirigami.Units.smallSpacing
-            Layout.topMargin: 0
-            Layout.bottomMargin: 0
             spacing: Kirigami.Units.smallSpacing
 
             PlasmaExtras.Heading {
@@ -102,9 +117,7 @@ Item {
 
             PlasmaComponents3.ToolButton {
                 id: configureButton
-
                 readonly property var configureAction: Plasmoid.internalAction("configure")
-
                 icon.name: "configure"
                 visible: !!configureAction
                 enabled: !!configureAction && configureAction.enabled
@@ -112,14 +125,11 @@ Item {
                 text: configureAction ? configureAction.text : i18n("Configure System Tray")
                 onClicked: configureButton.configureAction?.trigger()
 
-                PlasmaComponents3.ToolTip {
-                    text: configureButton.text
-                }
+                PlasmaComponents3.ToolTip { text: configureButton.text }
             }
 
             PlasmaComponents3.ToolButton {
                 id: pinButton
-
                 icon.name: "window-pin"
                 checkable: true
                 checked: Plasmoid.configuration.pin
@@ -127,14 +137,12 @@ Item {
                 text: i18n("Keep Open")
                 onToggled: Plasmoid.configuration.pin = checked
 
-                PlasmaComponents3.ToolTip {
-                    text: pinButton.text
-                }
+                PlasmaComponents3.ToolTip { text: pinButton.text }
             }
         }
 
-        Flow {
-            id: quickSettingsGrid
+        RowLayout {
+            id: connectivityRow
 
             Layout.fillWidth: true
             Layout.leftMargin: Kirigami.Units.smallSpacing
@@ -142,27 +150,59 @@ Item {
             spacing: Kirigami.Units.smallSpacing
 
             Repeater {
-                id: tiles
-
-                model: quickSettingsModel
-
+                id: wifiTiles
+                model: wifiModel
                 delegate: ControlTile {
-                    // Finish an odd row cleanly instead of leaving a spare
-                    // card-sized hole beside the last setting.
-                    spanFullRow: tiles.count % 2 === 1 && index === tiles.count - 1
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: 0
+                    onActivated: systemTrayState.expanded = false
+                }
+            }
+
+            Repeater {
+                id: bluetoothTiles
+                model: bluetoothModel
+                delegate: ControlTile {
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: 0
                     onActivated: systemTrayState.expanded = false
                 }
             }
         }
 
+        Item {
+            id: volumeTilesBox
+            Layout.fillWidth: true
+            Layout.leftMargin: Kirigami.Units.smallSpacing
+            Layout.rightMargin: Kirigami.Units.smallSpacing
+            implicitHeight: volumeTiles.count > 0 && volumeTiles.itemAt(0)
+                ? volumeTiles.itemAt(0).implicitHeight
+                : 0
+
+            Repeater {
+                id: volumeTiles
+                model: volumeModel
+                delegate: InlineAppletCard {
+                    anchors.left: parent ? parent.left : undefined
+                    anchors.right: parent ? parent.right : undefined
+                    titleOverride: i18n("Volume & Output")
+                    controlHeight: Kirigami.Units.gridUnit * 13
+                }
+            }
+        }
+
+        BrightnessQuickControl {
+            id: brightnessControl
+            Layout.leftMargin: Kirigami.Units.smallSpacing
+            Layout.rightMargin: Kirigami.Units.smallSpacing
+        }
+
         Kirigami.Separator {
             Layout.fillWidth: true
-            visible: notifications.visible
         }
 
         NotificationsSection {
             id: notifications
-
             Layout.fillWidth: true
             Layout.preferredHeight: implicitHeight
         }

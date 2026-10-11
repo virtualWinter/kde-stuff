@@ -100,6 +100,8 @@ plasma_add_applet(moe.vwinter.systemtray
         package/contents/ui/BackgroundAppItem.qml
         package/contents/ui/ConfigGeneral.qml
         package/contents/ui/ControlCenter.qml
+        package/contents/ui/BrightnessQuickControl.qml
+        package/contents/ui/InlineAppletCard.qml
         package/contents/ui/ControlTile.qml
         package/contents/ui/NotificationsSection.qml
         package/contents/ui/ExpanderArrow.qml
