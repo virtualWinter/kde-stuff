@@ -50,6 +50,9 @@ AbstractItem {
     readonly property bool opensControlCenter: onControlCenterGroup
         && Plasmoid.configuration.trayClickOpensControlCenter
 
+    // The tray, not the embedded applet, owns the clicks on those icons.
+    interceptInput: opensControlCenter
+
     /*
      * One continuous bar under the whole group: every icon of the group spans
      * its entire cell with the bar, so neighbouring bars join, and the bar

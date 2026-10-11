@@ -38,6 +38,14 @@ PlasmaCore.ToolTipArea {
 
     property bool effectivePressed: false
 
+    /*
+     * Some tray icons are not handled by the applet embedded in them, but by
+     * the tray itself: the quick settings icons open the control center
+     * instead of their applet's popup. Those take the mouse events before the
+     * applet does.
+     */
+    property bool interceptInput: false
+
     // Keep these in sync with HiddenItems.qml
     readonly property int margins: Kirigami.Units.smallSpacing
     readonly property int maxTextLines: 2
@@ -63,8 +71,9 @@ PlasmaCore.ToolTipArea {
         propagateComposedEvents: true
         // This needs to be above applets when it's in the grid hidden area
         // so that it can receive hover events while the mouse is over an applet,
-        // but below them on regular systray, so collapsing works
-        z: abstractItem.inHiddenLayout ? 1 : 0
+        // above them as well for the icons the tray handles itself, but below
+        // them on regular systray, so collapsing works
+        z: abstractItem.inHiddenLayout || abstractItem.interceptInput ? 1 : 0
         anchors.fill: abstractItem
         hoverEnabled: true
         drag.filterChildren: true
