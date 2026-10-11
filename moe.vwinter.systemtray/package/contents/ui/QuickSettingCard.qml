@@ -25,8 +25,14 @@ Rectangle {
     implicitHeight: content.implicitHeight
         + content.anchors.topMargin + content.anchors.bottomMargin
 
-    color: Qt.alpha(Kirigami.Theme.textColor, 0.06)
-    radius: Kirigami.Units.gridUnit * 0.5
+    color: Qt.alpha(Kirigami.Theme.textColor, 0.055)
+    radius: Kirigami.Units.gridUnit * 0.65
+    Behavior on color {
+        ColorAnimation {
+            duration: Kirigami.Units.shortDuration
+            easing.type: Easing.OutCubic
+        }
+    }
 
     ColumnLayout {
         id: content

@@ -12,26 +12,27 @@ import org.kde.kirigami as Kirigami
 import org.kde.plasma.components as PlasmaComponents3
 
 /*
- * An expandable quick-setting tile. The stock applet owns network scanning,
- * passwords, pairing and connection actions, so the expanded action opens its
- * own selector. The model roles are read through a plain root object: the
- * delegate model only initializes required properties declared there.
+ * A connectivity quick-setting tile. The model roles are read through a plain
+ * root object: the delegate model only initializes required properties there.
  */
 Item {
     id: tile
 
-    required property var model
-    required property int index
+    required property string itemId
+    required property string displayText
+    required property bool hasApplet
+    required property var applet
+    required property string iconName
 
-    signal activated()
+    signal requested(string itemId)
+    signal refreshRequested()
 
     property bool expanded: false
+    property Component expandedContent: null
 
-    readonly property Item applet: model.hasApplet ? model.applet : null
-    readonly property string itemId: model.itemId ?? ""
     readonly property string title: applet && applet.Plasmoid && applet.Plasmoid.title
         ? applet.Plasmoid.title
-        : (model.displayText ?? "")
+        : displayText
     readonly property string subtitle: {
         // The applet tooltip repeats the title when it has nothing to add.
         const lines = (applet?.toolTipSubText ?? "").split("\n");
@@ -39,9 +40,24 @@ Item {
         return first === "" || first === title ? "" : first;
     }
 
+    readonly property real compactHeight: Kirigami.Units.gridUnit * 4.5
+    readonly property real expandedHeight: Kirigami.Units.gridUnit * 15
+
     Layout.fillWidth: true
-    implicitHeight: Math.max(Kirigami.Units.gridUnit * 4,
-                             content.implicitHeight + Kirigami.Units.smallSpacing * 4)
+    Layout.preferredHeight: implicitHeight
+    implicitHeight: compactHeight + (expanded ? expandedHeight : 0)
+
+    Behavior on implicitHeight {
+        NumberAnimation {
+            duration: Kirigami.Units.longDuration
+            easing.type: Easing.OutCubic
+        }
+    }
+
+    TapHandler {
+        enabled: !tile.expanded
+        onTapped: tile.requested(tile.itemId)
+    }
 
     HoverHandler {
         id: tileHover
@@ -53,6 +69,14 @@ Item {
 
         anchors.fill: parent
         color: Qt.alpha(Kirigami.Theme.textColor, tileHover.hovered ? 0.12 : 0.06)
+        radius: Kirigami.Units.gridUnit * 0.65
+
+        Behavior on color {
+            ColorAnimation {
+                duration: Kirigami.Units.shortDuration
+                easing.type: Easing.OutCubic
+            }
+        }
     }
 
     ColumnLayout {
@@ -68,13 +92,14 @@ Item {
             Layout.fillWidth: true
 
             TapHandler {
-                onTapped: tile.expanded = !tile.expanded
+                enabled: tile.expanded
+                onTapped: tile.requested(tile.itemId)
             }
 
             Kirigami.Icon {
                 Layout.preferredWidth: Kirigami.Units.iconSizes.medium
                 Layout.preferredHeight: Layout.preferredWidth
-                source: tile.model.iconName ?? ""
+                source: tile.iconName
             }
 
             ColumnLayout {
@@ -99,25 +124,48 @@ Item {
                 }
             }
 
+            PlasmaComponents3.ToolButton {
+                visible: tile.itemId === "org.kde.plasma.networkmanagement" && tile.expanded
+                icon.name: "view-refresh"
+                text: i18n("Refresh networks")
+                display: PlasmaComponents3.AbstractButton.IconOnly
+                onClicked: tile.refreshRequested()
+
+                PlasmaComponents3.ToolTip {
+                    text: parent.text
+                }
+            }
+
             Kirigami.Icon {
                 Layout.preferredWidth: Kirigami.Units.iconSizes.small
                 Layout.preferredHeight: Layout.preferredWidth
-                source: tile.expanded ? "go-up" : "go-down"
+                source: tile.expanded ? "go-down" : "go-next"
                 opacity: 0.65
+                x: tileHover.hovered ? Kirigami.Units.smallSpacing / 3 : 0
+
+                Behavior on x {
+                    NumberAnimation {
+                        duration: Kirigami.Units.shortDuration
+                        easing.type: Easing.OutCubic
+                    }
+                }
             }
         }
 
-        PlasmaComponents3.Button {
+        Loader {
             Layout.fillWidth: true
+            Layout.preferredHeight: tile.expanded ? tile.expandedHeight : 0
             visible: tile.expanded
-            text: tile.itemId === "org.kde.plasma.networkmanagement"
-                ? i18n("Choose a network…")
-                : i18n("Choose a device…")
-            icon.name: "go-next"
-            onClicked: {
-                if (tile.applet?.Plasmoid) {
-                    tile.applet.Plasmoid.activated();
-                    tile.activated();
+            active: tile.expanded
+            sourceComponent: tile.expandedContent
+            clip: true
+            asynchronous: false
+            opacity: visible ? 1 : 0
+
+            Behavior on opacity {
+                NumberAnimation {
+                    duration: Kirigami.Units.shortDuration
+                    easing.type: Easing.OutCubic
                 }
             }
         }

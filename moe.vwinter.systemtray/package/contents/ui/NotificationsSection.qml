@@ -6,37 +6,27 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import QtQuick.Layouts
-
 import org.kde.kirigami as Kirigami
-import org.kde.plasma.components as PlasmaComponents3
-import org.kde.plasma.extras as PlasmaExtras
 import org.kde.kitemmodels as KItemModels
 import org.kde.plasma.plasmoid
 
 /*
  * The notification list, docked below the quick settings. It renders the
  * org.kde.plasma.notifications applet's own full representation, so Do Not
- * Disturb and Clear All keep working. When there is nothing to show, a compact
- * empty state keeps the footer present instead of leaving a visual gap.
+ * Disturb and Clear All keep working. The section is hidden when its model is empty.
  */
 Item {
     id: section
 
     readonly property string notificationsAppletId: "org.kde.plasma.notifications"
-    readonly property int maximumHeight: Kirigami.Units.gridUnit * 12
-
     property Item applet: null
     property Item notificationList: null
 
-    // The stock representation is taller than its bare header once it has
-    // notifications to show.
-    readonly property bool hasNotificationContent: notificationList
-        && notificationList.implicitHeight > Kirigami.Units.gridUnit * 2
-    implicitHeight: heading.height + Kirigami.Units.smallSpacing
-        + (hasNotificationContent
-            ? Math.min(notificationList.implicitHeight, maximumHeight)
-            : emptyState.implicitHeight)
+    readonly property bool hasNotificationContent: !!notificationList?.historyModel
+        && notificationList.historyModel.count > 0
+    implicitHeight: hasNotificationContent
+        ? Math.min(notificationList.implicitHeight, Kirigami.Units.gridUnit * 12)
+        : 0
 
     KItemModels.KSortFilterProxyModel {
         id: notificationsModel
@@ -67,60 +57,10 @@ Item {
         }
     }
 
-    PlasmaExtras.Heading {
-        id: heading
-
-        anchors {
-            top: parent.top
-            left: parent.left
-            right: parent.right
-            leftMargin: Kirigami.Units.smallSpacing
-            rightMargin: Kirigami.Units.smallSpacing
-        }
-        level: 4
-        height: Kirigami.Units.gridUnit * 2
-        text: i18n("Notifications")
-        elide: Text.ElideRight
-        maximumLineCount: 1
-    }
-
     Item {
         id: host
         visible: section.hasNotificationContent
-        anchors {
-            top: heading.bottom
-            bottom: parent.bottom
-            left: parent.left
-            right: parent.right
-        }
-    }
-
-    ColumnLayout {
-        id: emptyState
-
-        anchors {
-            top: heading.bottom
-            left: parent.left
-            right: parent.right
-            topMargin: Kirigami.Units.smallSpacing
-        }
-        visible: !section.hasNotificationContent
-        spacing: Kirigami.Units.smallSpacing
-
-        Kirigami.Icon {
-            Layout.alignment: Qt.AlignHCenter
-            Layout.preferredWidth: Kirigami.Units.iconSizes.smallMedium
-            Layout.preferredHeight: Layout.preferredWidth
-            source: "notifications-disabled"
-            opacity: 0.5
-        }
-
-        PlasmaComponents3.Label {
-            Layout.fillWidth: true
-            text: i18n("No new notifications")
-            horizontalAlignment: Text.AlignHCenter
-            opacity: 0.65
-        }
+        anchors.fill: parent
     }
 
     function syncNotificationList() {

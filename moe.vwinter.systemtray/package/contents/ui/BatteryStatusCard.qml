@@ -44,7 +44,15 @@ Item {
 
     QuickSettingCard {
         anchors.fill: parent
-        color: Qt.alpha(Kirigami.Theme.textColor, hover.hovered ? 0.12 : 0.06)
+        color: Qt.alpha(Kirigami.Theme.textColor, hover.hovered ? 0.10 : 0.055)
+        radius: Kirigami.Units.gridUnit * 0.65
+
+        Behavior on color {
+            ColorAnimation {
+                duration: Kirigami.Units.shortDuration
+                easing.type: Easing.OutCubic
+            }
+        }
     }
 
     RowLayout {

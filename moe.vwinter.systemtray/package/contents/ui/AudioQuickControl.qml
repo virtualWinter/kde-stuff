@@ -152,6 +152,13 @@ QuickSettingCard {
         visible: !!audio.sink
         color: Qt.alpha(Kirigami.Theme.textColor, outputHover.hovered ? 0.10 : 0.05)
 
+        Behavior on color {
+            ColorAnimation {
+                duration: Kirigami.Units.shortDuration
+                easing.type: Easing.OutCubic
+            }
+        }
+
         HoverHandler {
             id: outputHover
             cursorShape: Qt.PointingHandCursor

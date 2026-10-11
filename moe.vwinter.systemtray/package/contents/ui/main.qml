@@ -261,8 +261,24 @@ ContainmentItem {
                 } else {
                     dialog.requestActivate();
                     controlCenter.forceActiveFocus();
+                    Qt.callLater(dialog.syncControlCenterHeight);
                 }
             }
+
+            function syncControlCenterHeight() {
+                if (!dialog.visible || !controlCenter) {
+                    return;
+                }
+                dialog.height = controlCenter.implicitHeight + dialog.topPadding + dialog.bottomPadding;
+            }
+
+            Connections {
+                target: controlCenter
+                function onImplicitHeightChanged() {
+                    dialog.syncControlCenterHeight();
+                }
+            }
+
             mainItem: ControlCenter {
                 id: controlCenter
 
