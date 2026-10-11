@@ -30,11 +30,12 @@ Item {
 
     implicitWidth: Kirigami.Units.gridUnit * 22
     implicitHeight: Math.max(Kirigami.Units.gridUnit * 12,
-                             content.implicitHeight + heading.height)
+                             content.implicitHeight)
     Layout.minimumWidth: implicitWidth
     Layout.minimumHeight: implicitHeight
 
     focus: true
+
 
     // Role numbers from BaseModel::BaseRole in src/systemtraymodel.h:
     // ItemType = Qt::UserRole + 1, ItemId = +2, EffectiveStatus = +6.
@@ -64,21 +65,6 @@ Item {
         Component.onCompleted: sourceModel = Plasmoid.systemTrayModel
     }
 
-    PlasmaExtras.PlasmoidHeading {
-        id: heading
-
-        anchors {
-            top: parent.top
-            left: parent.left
-            right: parent.right
-        }
-        height: headerRow.height + bottomPadding
-
-        // The popup window surface already provides the background; the
-        // heading's themed background would reintroduce a second tone.
-        background.visible: false
-    }
-
     ColumnLayout {
         id: content
 
@@ -87,7 +73,6 @@ Item {
             right: parent.right
             top: parent.top
             bottom: parent.bottom
-            topMargin: heading.height
         }
         spacing: Kirigami.Units.smallSpacing / 2
 
